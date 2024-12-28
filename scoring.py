@@ -85,13 +85,13 @@ def skill_to_string(skill) -> str:
 		out += f' {s_card_id}'
 	elif id == 'overload':
 		out += id
-		s_y = skill.get('y')
-		if s_y:
-			out += f" {TYPES[int(skill.get('y'))]}"
 		s_n = skill.get('n')
 		if s_n == None:
 			s_n = 1
 		out += " {}".format(s_n)
+		s_y = skill.get('y')
+		if s_y:
+			out += f" {TYPES[int(skill.get('y'))]}"
 
 	elif id == 'enhance':
 		out += id
