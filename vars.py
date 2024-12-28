@@ -63,7 +63,9 @@ SKILLS = (
 	'fortify',
 	'hunt',
 	'scavenge',
+	'rupture',
 	'flying',
+	'rush',
 )
 
 SKILLS_PRETTY = (
@@ -120,7 +122,9 @@ SKILLS_PRETTY = (
 	'Fortify',
 	'Hunt',
 	'Scavenge',
+	'Rupture',
 	'Flying',
+	'Rush',
 )
 
 TYPES = (

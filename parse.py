@@ -16,6 +16,7 @@ def main():
 	files = find_files(pattern)
 	# load xml
 	for file in files:
+		print(file)
 		tree = ET.parse(file)
 		root = tree.getroot()
 		
@@ -37,7 +38,9 @@ def main():
 			card_attack = card.find('attack') # convert attack and health for scoring
 			if card_attack != None and card_attack.text != None:
 				card_attack = int(card_attack.text)
-			card_health = int(card.find('health').text)
+			card_health = card.find('health')
+			if card_health != None and card_health.text != None:
+				card_health = int(card_health.text)
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate through all upgrades for final card version
 			for upgrade in card.findall('upgrade'):
@@ -56,7 +59,7 @@ def main():
 					for skill in upgrade.findall('skill'):
 						card_skills.append(skill)
 			# score stats
-			total_stats = card_health
+			total_stats = card_health if card_health != None else 0
 			if card_attack != None:
 				total_stats += card_attack
 			adjusted_stats = (total_stats) / (card_cost + 1)

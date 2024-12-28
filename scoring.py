@@ -17,8 +17,11 @@ def score_skill(skill) -> int:
 		if skill.get('trigger'):
 			score += 30 * s_n
 		else: # "Jam/Flurry n every c"
-			if skill.get('c'):
-				s_c = int(skill.get('c'))
+			s_c = skill.get('c')
+			if s_c:
+				s_c = int(s_c)
+			else:
+				s_c = 8 # default value?
 			cooldown_decrease = 8-s_c
 			score += 10 # estimated 10 for flurry 1 every 8
 			# estimated 10 additional per reduced cooldown (c)
@@ -42,6 +45,8 @@ def score_skill(skill) -> int:
 		score = 10 # todo calculate summon value
 	elif id == 'flying':
 		score = 69 # nice
+	elif id == 'rush':
+		score = 0
 	elif id == 'evolve': # n, s (base skill), s2 (upgrade)
 		s_n = skill.get('n')
 		if s_n:
@@ -59,13 +64,20 @@ def score_skill(skill) -> int:
 			s_x = 1
 		score += s_x * 15 # check rate
 	else: # default 1:1 budgeting
-		score = skill.get('x')
+		if id in SKILLS:
+			score = int(skill.get('x'))
+		else:
+			print("Unknown")
+			score = -10000 # move unknown skill to extreme end
 	return int(score)
 
 # Convert skill Element to string for display
 def skill_to_string(skill) -> str:
 	out = ""
 	id = skill.get("id")
+	if not id in SKILLS: # Catch unregistered skills
+		out += f"Unknown skill '{id}'"
+		return out
 	if skill.get("trigger"): # trigger is prefix
 		out += "On " + skill.get("trigger") + ": "
 	s_all = skill.get('all')
