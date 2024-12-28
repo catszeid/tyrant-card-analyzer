@@ -1,12 +1,13 @@
 # skill xml attributes
 #	id - skill name (see SKILLS)
 #	all - does this apply to all eligibile assault? 1=true
-#	x - skill magnitude. integer
-#	y - type (faction) restriction
-#	n - amount of times to trigger. integer [Jam and Flurry ONLY]
-#	c - cooldown between activations. integer [Jam and Flurry ONLY]
+#	x - skill magnitude. int
+#	y - type (faction) restriction. int
+#	n - amount of times to trigger. int [Jam and Flurry]
+#	c - cooldown between activations. int [Jam and Flurry]
 #	trigger - activation override for when to trigger (see TRIGGERS)
-#	card_id - id of summoned card. [Summon ONLY]
+#	card_id - id of summoned card. [Summon]
+#	s - base skill affected [Enhance and Evolve]
 
 SKILLS = (
 	'none',
@@ -32,12 +33,14 @@ SKILLS = (
 	'flurry',
 	'valor',
 	'overload',
+	'legion',
 	'payback',
 	'avenge',
 	'refresh',
+	'evolve',
 	'venom',
 	'mend',
-	'mortar',
+	'siege',
 	'swipe',
 	'sunder',
 	'enrage',
@@ -47,7 +50,7 @@ SKILLS = (
 	'revenge',
 	'mimic',
 	'coalition',
-	'subdue',
+	'sabotage',
 	'barrier',
 	'entrap',
 	'subdue',
@@ -59,7 +62,65 @@ SKILLS = (
 	'mark',
 	'fortify',
 	'hunt',
-	'scavenge'
+	'scavenge',
+	'flying',
+)
+
+SKILLS_PRETTY = (
+	'None',
+	'Wall',
+	'Armored',
+	'Counter',
+	'Heal',
+	'Rally',
+	'Strike',
+	'Weaken',
+	'Siege',
+	'Pierce',
+	'Poison',
+	'Leech',
+	'Evade',
+	'Berserk',
+	'Enfeeble',
+	'Protect',
+	'Enhance',
+	'Jam',
+	'Corrosive',
+	'Inhibit',
+	'Flurry',
+	'Valor',
+	'Overload',
+	'Legion',
+	'Payback',
+	'Avenge',
+	'Refresh',
+	'Evolve',
+	'Venom',
+	'Mend',
+	'Mortar',
+	'Swipe',
+	'Sunder',
+	'Enrage',
+	'Allegiance',
+	'Drain',
+	'Stasis',
+	'Revenge',
+	'Mimic',
+	'Coalition',
+	'Sabotage',
+	'Barrier',
+	'Entrap',
+	'Subdue',
+	'Tribute',
+	'Summon',
+	'Bravery',
+	'Absorb',
+	'Disease',
+	'Mark',
+	'Fortify',
+	'Hunt',
+	'Scavenge',
+	'Flying',
 )
 
 TYPES = (
@@ -76,4 +137,14 @@ TRIGGERS = (
 	"attacked", # trigger when card attacked
 	"death", # trigger on card death
 	"play", # trigger on card play
+)
+
+RARITY = (
+	"None",
+	"Common",
+	"Rare",
+	"Epic",
+	"Legendary",
+	"Vindicator",
+	"Mythic"
 )

@@ -1,10 +1,11 @@
-from vars import SKILLS, TYPES
+from vars import SKILLS, SKILLS_PRETTY, TYPES
 
 # Scoring functions to process card values
 
 # Score a skill's budget
 def score_skill(skill) -> int:
 	id = skill.get('id')
+	s_name = SKILLS_PRETTY[SKILLS.index(id)]
 	score = 0
 	if id == 'jam' or id == 'flurry': # complex pricing, see below
 		s_n = skill.get('n')
