@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 import re
+import argparse
 
 import scoring as scor
 
@@ -11,9 +12,11 @@ def find_files(file_pattern):
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
 	return match_files
 
-def main():
+def main(args):
+	print(f"Set: {args.set}")
 	pattern = "^cards_section_\d*.xml$"
 	files = find_files(pattern)
+	input(f"{len(files)} files found. Press enter to continue...")
 	# load xml
 	for file in files:
 		print(file)
@@ -28,7 +31,14 @@ def main():
 			card_name = card.find('name')
 			if card_name != None:
 				card_name = card_name.text
-			
+			card_set = card.find('set')
+			if card_set != None:
+				card_set = card_set.text
+			if card_set != None and args.set != None:
+				if int(card_set) == args.set:
+					pass
+				else:
+					continue
 			card_cost = card.find('cost') # convert for scoring
 			if card_cost != None and card_cost.text != None:
 				card_cost = int(card_cost.text)
@@ -78,4 +88,7 @@ def main():
 			print(card_result.format(card_name, total_stats, adjusted_stats, card_cost, avg_skill_score, *final_skills))
 
 if __name__ == "__main__":
-	main()
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--set", help="only cards from set", type=int)
+	args = parser.parse_args()
+	main(args)
