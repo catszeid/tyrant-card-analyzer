@@ -91,13 +91,13 @@ def main(args):
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
-				if upgrade.find('id') and upgrade.find('id').text != None:
-					card_id = int(upgrade.find('attack').text)
-				if upgrade.find('attack'):
+				if upgrade.find('card_id') != None:
+					card_id = upgrade.find('card_id').text
+				if upgrade.find('attack') != None:
 					card_attack = int(upgrade.find('attack').text)
-				if upgrade.find('health'):
+				if upgrade.find('health') != None:
 					card_health = int(upgrade.find('health').text)
-				if upgrade.find('cost'):
+				if upgrade.find('cost') != None:
 					if upgrade.find('cost').text == None:
 						card_cost = 0
 					else:
@@ -122,9 +122,9 @@ def main(args):
 				final_skills.append(scor.skill_to_string(skill))
 			if len(final_skills) > 0:
 				avg_skill_score = skill_score / len(final_skills)
-			card_result = "{} [{:.5}]({}) - [{:.5}]"
+			card_result = "[{:5}]{} [{:.5}]({}) - [{:.5}]"
 			card_result += " {}"*len(card_skills)
-			print(card_result.format(card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
+			print(card_result.format(card_id, card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
