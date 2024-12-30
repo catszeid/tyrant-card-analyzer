@@ -41,6 +41,15 @@ def main(args):
 					pass
 				else:
 					continue
+			# card rarity filtering
+			card_rarity = card.find('rarity')
+			if card_rarity != None:
+				card_rarity = card_rarity.text
+			if card_rarity != None and args.rarity != None:
+				if int(card_rarity) == args.rarity:
+					pass
+				else:
+					continue
 			# card cost (Commander have no cost)
 			card_cost = card.find('cost') # convert for scoring
 			if card_cost == None:
@@ -101,6 +110,7 @@ def main(args):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--set", help="only cards from set", type=int)
+	parser.add_argument("--set", help="filter by set", type=int)
+	parser.add_argument("--rarity", help="filter by rarity (1-6)", type=int)
 	args = parser.parse_args()
 	main(args)
