@@ -28,9 +28,11 @@ def main(args):
 			if card == None:
 				print("Found empty card, skipping...")
 				continue
+			# card name
 			card_name = card.find('name')
 			if card_name != None:
 				card_name = card_name.text
+			# card set + filtering
 			card_set = card.find('set')
 			if card_set != None:
 				card_set = card_set.text
@@ -39,20 +41,30 @@ def main(args):
 					pass
 				else:
 					continue
+			# card cost (Commander have no cost)
 			card_cost = card.find('cost') # convert for scoring
-			if card_cost != None and card_cost.text != None:
+			if card_cost == None:
+				continue # commander analysis will be considered later
+			if card_cost.text != None:
 				card_cost = int(card_cost.text)
 			else:
 				card_cost = 0
-			
+			# card attack (Structure have no attack)
 			card_attack = card.find('attack') # convert attack and health for scoring
+			if card_attack == None:
+				pass # Structure have no attack tag
 			if card_attack != None and card_attack.text != None:
 				card_attack = int(card_attack.text)
+			# card health
 			card_health = card.find('health')
 			if card_health != None and card_health.text != None:
 				card_health = int(card_health.text)
+			else:
+				print(f"Error: No health found for {card_name}")
+				continue
+			# card skills
 			card_skills = card.findall('skill') # list of 'skill' Elements
-			# iterate through all upgrades for final card version
+			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
 				if upgrade.find('attack'):
 					card_attack = int(upgrade.find('attack').text)
@@ -83,9 +95,9 @@ def main(args):
 				final_skills.append(scor.skill_to_string(skill))
 			if len(final_skills) > 0:
 				avg_skill_score = skill_score / len(final_skills)
-			card_result = "{} [{},{:.5}]({}) - [{:.5}]"
+			card_result = "{} [{:.5}]({}) - [{:.5}]"
 			card_result += " {}"*len(card_skills)
-			print(card_result.format(card_name, total_stats, adjusted_stats, card_cost, avg_skill_score, *final_skills))
+			print(card_result.format(card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
