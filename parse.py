@@ -13,13 +13,22 @@ def find_files(file_pattern):
 	return match_files
 
 def main(args):
-	print(f"Set: {args.set}")
-	pattern = "^cards_section_\d*.xml$"
-	files = find_files(pattern)
+	# file gathering
+	files = []
+	if args.file != None:
+		dir_contents = os.listdir(os.getcwd())
+		for file in args.file:
+			if file in dir_contents:
+				files.append(file)
+			else:
+				print(f"Failed to find {file}")
+	else:
+		pattern = "^cards_section_\d*.xml$"
+		files = find_files(pattern)
 	input(f"{len(files)} files found. Press enter to continue...")
 	# load xml
 	for file in files:
-		print(file)
+		print(f"Processing {file}...")
 		tree = ET.parse(file)
 		root = tree.getroot()
 		
@@ -28,6 +37,12 @@ def main(args):
 			if card == None:
 				print("Found empty card, skipping...")
 				continue
+			# card id
+			card_id = card.find('id')
+			if card_id != None:
+				card_id = card_id.text
+			else:
+				 card_id = -1
 			# card name
 			card_name = card.find('name')
 			if card_name != None:
@@ -57,7 +72,8 @@ def main(args):
 			if card_cost.text != None:
 				card_cost = int(card_cost.text)
 			else:
-				card_cost = 0
+				print(f"Error: No cost found for {card_id}")
+				continue
 			# card attack (Structure have no attack)
 			card_attack = card.find('attack') # convert attack and health for scoring
 			if card_attack == None:
@@ -69,12 +85,14 @@ def main(args):
 			if card_health != None and card_health.text != None:
 				card_health = int(card_health.text)
 			else:
-				print(f"Error: No health found for {card_name}")
+				print(f"Error: No health found for {card_id}")
 				continue
 			# card skills
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
+				if upgrade.find('id') and upgrade.find('id').text != None:
+					card_id = int(upgrade.find('attack').text)
 				if upgrade.find('attack'):
 					card_attack = int(upgrade.find('attack').text)
 				if upgrade.find('health'):
@@ -90,7 +108,7 @@ def main(args):
 					for skill in upgrade.findall('skill'):
 						card_skills.append(skill)
 			# score stats
-			total_stats = card_health if card_health != None else 0
+			total_stats = card_health
 			if card_attack != None:
 				total_stats += card_attack
 			adjusted_stats = (total_stats) / (card_cost + 1)
@@ -112,5 +130,6 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--set", help="filter by set", type=int)
 	parser.add_argument("--rarity", help="filter by rarity (1-6)", type=int)
+	parser.add_argument("-f", "--file", action="extend", nargs="+", help="select file. Load all by default", type=str)
 	args = parser.parse_args()
 	main(args)
