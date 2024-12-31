@@ -44,7 +44,8 @@ def main(args):
 			if card_id != None:
 				card_id = card_id.text
 			else:
-				 card_id = "-1"
+				print("Skipping card due to missing id")
+				continue # skip
 			# card name
 			card_name = card.find('name')
 			if card_name != None:
@@ -96,7 +97,7 @@ def main(args):
 				if upgrade.find('card_id') != None:
 					card_id = upgrade.find('card_id').text
 				if upgrade.find('attack') != None:
-					if upgrade.find('attack').text == None:
+					if upgrade.find('attack').text == None: # 47055 has 'attack' with no text
 						print(card_id)
 					else:
 						card_attack = int(upgrade.find('attack').text)
