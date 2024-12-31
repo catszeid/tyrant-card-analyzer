@@ -26,6 +26,8 @@ def main(args):
 		pattern = "^cards_section_\d*.xml$"
 		files = find_files(pattern)
 	input(f"{len(files)} files found. Press enter to continue...")
+	# output results
+	results = {}
 	# load xml
 	for file in files:
 		print(f"Processing {file}...")
@@ -42,7 +44,7 @@ def main(args):
 			if card_id != None:
 				card_id = card_id.text
 			else:
-				 card_id = -1
+				 card_id = "-1"
 			# card name
 			card_name = card.find('name')
 			if card_name != None:
@@ -94,7 +96,10 @@ def main(args):
 				if upgrade.find('card_id') != None:
 					card_id = upgrade.find('card_id').text
 				if upgrade.find('attack') != None:
-					card_attack = int(upgrade.find('attack').text)
+					if upgrade.find('attack').text == None:
+						print(card_id)
+					else:
+						card_attack = int(upgrade.find('attack').text)
 				if upgrade.find('health') != None:
 					card_health = int(upgrade.find('health').text)
 				if upgrade.find('cost') != None:
@@ -122,9 +127,58 @@ def main(args):
 				final_skills.append(scor.skill_to_string(skill))
 			if len(final_skills) > 0:
 				avg_skill_score = skill_score / len(final_skills)
-			card_result = "[{:5}]{} [{:.5}]({}) - [{:.5}]"
-			card_result += " {}"*len(card_skills)
-			print(card_result.format(card_id, card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
+			# card_result = "[{:5}]{} [{:.5}]({}) - [{:.5}]"
+			# card_result += " {}"*len(card_skills)
+			# print(card_result.format(card_id, card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
+
+			# dictionary holding name, rarity, cost, adjusted stats, avg skill score
+			results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+
+	out_string = "[{}] {} ({}) - {:.5} / {:.5}"
+	# rarity, name, id, adjusted stats, avg skill score
+
+	skill_sorted = sort_by_key_and_fields(results, 'avg_skill', 'adj_stats')
+	print("Sort by Stats + Skill")
+	for key in skill_sorted:
+		print(out_string.format(results[key]['rarity'], results[key]['name'], results[key]['id'], results[key]['adj_stats'], results[key]['avg_skill']))
+
+# Return sorted list of ids given a field
+def sort_by_key_and_field(data, field) -> []:
+	sorted = []
+	for key in list(data):
+		score = data[key][field]
+		sorted.append(key)
+		index = len(sorted)-1
+		while index > 0 and data[sorted[index-1]][field] < score:
+			# swap elements
+			sorted[index] = sorted[index - 1]
+			sorted[index-1] = key
+			# decrement index
+			index -= 1
+	return sorted
+
+# Return sorted list of ids given multiple fields
+def sort_by_key_and_fields(data, *argv) -> []:
+	sorted = []
+	for key in list(data):
+		score = 0
+		for arg in argv:
+			score += data[key][arg]
+		sorted.append(key)
+		index = len(sorted)-1
+		while index > 0:
+			o_score = 0
+			for arg in argv:
+				o_score += data[sorted[index-1]][arg]
+			if o_score < score:
+				# swap elements
+				sorted[index] = sorted[index - 1]
+				sorted[index-1] = key
+				# decrement index
+				index -= 1
+			else:
+				break
+	return sorted
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
