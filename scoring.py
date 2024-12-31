@@ -62,7 +62,7 @@ def score_skill(skill) -> int:
 			s_x = int(s_x)
 		else:
 			s_x = 1
-		score += s_x * 15 # check rate
+		score += s_x * 1 # check rate
 	else: # default 1:1 budgeting
 		if id in SKILLS:
 			score = int(skill.get('x'))
