@@ -30,8 +30,8 @@ def main(args):
 	results = {}
 	# load xml
 	for file in files:
-		print(f"Processing {file}...")
-		tree = ET.parse(file)
+		print(f"Processing {os.path.join(os.getcwd(), 'data', file)}...")
+		tree = ET.parse(os.path.join(os.getcwd(), 'data', file))
 		root = tree.getroot()
 		
 		# Iterate over all cards
