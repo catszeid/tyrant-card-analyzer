@@ -226,3 +226,15 @@ def test_drain_score():
 	skill = ET.Element("skill", attrib={"id": "drain", "x": "10"})
 	score = s.score_skill(skill)
 	assert score == target
+
+def test_stasis_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "stasis", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_revenge_score():
+	target = 50
+	skill = ET.Element("skill", attrib={"id": "revenge", "x": "5"})
+	score = s.score_skill(skill)
+	assert score == target

@@ -30,14 +30,12 @@ def score_skill(skill) -> int:
 			score += (s_n - 1) * 10
 	elif id == 'allegiance' or id == 'legion' or id == 'coalition' or id == 'scavenge':
 		score = int(skill.get('x'))*2 # 2 budget per skill
-	elif id == 'revenge' or id == 'inhibt' or id == 'evade':
+	elif id == 'payback' or id == 'revenge' or id == 'inhibt' or id == 'evade':
 		score = int(skill.get('x'))*10 # 10 budget per skill
 	elif id == 'evade':
 		score = int(skill.get('x'))*10
 	elif id == 'absorb':
 		score = int(skill.get('x'))/2 # 1 budget per 2 skill
-	elif id == 'inhibit' or id == 'payback':
-		score = int(skill.get('x'))*10
 	elif id == 'wall':
 		score = 10
 	elif id == 'overload':
