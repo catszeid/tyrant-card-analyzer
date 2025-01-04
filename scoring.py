@@ -36,7 +36,7 @@ def score_skill(skill) -> int:
 		score = int(skill.get('x'))*10
 	elif id == 'absorb':
 		score = int(skill.get('x'))/2 # 1 budget per 2 skill
-	elif id == 'inhibit' or 'payback':
+	elif id == 'inhibit' or id == 'payback':
 		score = int(skill.get('x'))*10
 	elif id == 'wall':
 		score = 10
