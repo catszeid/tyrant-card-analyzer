@@ -6,7 +6,7 @@ import argparse
 import scoring as scor
 
 def find_files(file_pattern):
-	dir_contents = os.listdir(os.getcwd())
+	dir_contents = os.listdir(os.path.join(os.getcwd(), 'data'))
 	# regex to match xml files
 	pattern = re.compile(file_pattern)
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
@@ -16,7 +16,7 @@ def main(args):
 	# file gathering
 	files = []
 	if args.file != None:
-		dir_contents = os.listdir(os.getcwd())
+		dir_contents = os.listdir(os.path.join(os.getcwd(), 'data'))
 		for file in args.file:
 			if file in dir_contents:
 				files.append(file)
