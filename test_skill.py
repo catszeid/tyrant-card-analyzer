@@ -238,3 +238,111 @@ def test_revenge_score():
 	skill = ET.Element("skill", attrib={"id": "revenge", "x": "5"})
 	score = s.score_skill(skill)
 	assert score == target
+
+def test_mimic_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "mimic", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_coalition_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "coalition", "x": "5"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_sabotage_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "sabotage", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_barrier_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "barrier", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_entrap_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "entrap", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_subdue_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "subdue", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_tribute_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "tribute", "x": "1"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_summon_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "summon", "card_id": "1"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_bravery_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "bravery", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_absorb_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "absorb", "x": "20"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_disease_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "disease", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_mark_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "mark", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_fortify_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "fortify", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_hunt_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "hunt", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_scavenge_score():
+	target = 20
+	skill = ET.Element("skill", attrib={"id": "scavenge", "x": "10"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_rupture_score():
+	target = 10
+	skill = ET.Element("skill", attrib={"id": "rupture", "x": "5"})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_flying_score():
+	target = 69
+	skill = ET.Element("skill", attrib={"id": "flying",})
+	score = s.score_skill(skill)
+	assert score == target
+
+def test_rush_score():
+	target = 0
+	skill = ET.Element("skill", attrib={"id": "rush"})
+	score = s.score_skill(skill)
+	assert score == target

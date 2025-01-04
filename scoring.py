@@ -28,11 +28,13 @@ def score_skill(skill) -> int:
 			score += cooldown_decrease*10
 			# estimated 10 additional per iteration (n)
 			score += (s_n - 1) * 10
-	elif id == 'allegiance' or id == 'legion' or id == 'coalition' or id == 'scavenge':
+	elif id == 'allegiance' or id == 'legion' or id == 'coalition' or id == 'scavenge' or id == 'rupture':
 		score = int(skill.get('x'))*2 # 2 budget per skill
-	elif id == 'payback' or id == 'revenge' or id == 'inhibt' or id == 'evade':
+	elif id == 'payback' or id == 'revenge' or id == 'inhibit' or id == 'evade':
 		score = int(skill.get('x'))*10 # 10 budget per skill
 	elif id == 'evade':
+		score = int(skill.get('x'))*10
+	elif id == 'tribute':
 		score = int(skill.get('x'))*10
 	elif id == 'absorb':
 		score = int(skill.get('x'))/2 # 1 budget per 2 skill
