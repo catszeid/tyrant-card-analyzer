@@ -28,6 +28,7 @@ def main(args):
 	input(f"{len(files)} files found. Press enter to continue...")
 	# output results
 	results = {}
+	# More args parsing
 	# load xml
 	for file in files:
 		print(f"Processing {os.path.join(os.getcwd(), 'data', file)}...")
@@ -55,7 +56,7 @@ def main(args):
 			if card_set != None:
 				card_set = card_set.text
 			if card_set != None and args.set != None:
-				if int(card_set) == args.set:
+				if int(card_set) in args.set:
 					pass
 				else:
 					continue
@@ -65,6 +66,17 @@ def main(args):
 				card_rarity = card_rarity.text
 			if card_rarity != None and args.rarity != None:
 				if int(card_rarity) == args.rarity:
+					pass
+				else:
+					continue
+			# card fusion level
+			card_fusion_level = card.find('fusion_level')
+			if card_fusion_level != None:
+				card_fusion_level = int(card_fusion_level.text)
+			else:
+				card_fusion_level = 1
+			if args.fusion_level != None:
+				if int(card_fusion_level) in args.fusion_level:
 					pass
 				else:
 					continue
@@ -90,6 +102,17 @@ def main(args):
 			else:
 				print(f"Error: No health found for {card_id}")
 				continue
+			# card type (faction)
+			card_type = card.find('type')
+			if card_type != None:
+				card_type = int(card_type.text)
+			else:
+				card_type = 0 # invalid, mapped to None
+			if args.faction != None:
+				if card_type in args.faction:
+					pass
+				else:
+					continue
 			# card skills
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate and apply upgrades
@@ -183,8 +206,10 @@ def sort_by_key_and_fields(data, *argv) -> []:
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--set", help="filter by set", type=int)
-	parser.add_argument("--rarity", help="filter by rarity (1-6)", type=int)
-	parser.add_argument("-f", "--file", action="extend", nargs="+", help="select file. Load all by default", type=str)
+	parser.add_argument("--set", action="extend", nargs="+", help="Filter by set id", type=int)
+	parser.add_argument("--rarity", action="extend", nargs="+", help="Filter by rarity (1-6)", type=int)
+	parser.add_argument("-f", "--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
+	parser.add_argument("-fl", "--fusion-level", action="extend", nargs="+", help="Filter by Fusion level (0-2)", type=int)
+	parser.add_argument("--faction", action="extend", nargs="+", help="Whitelist faction(s) (1-6)", type=int)
 	args = parser.parse_args()
 	main(args)
