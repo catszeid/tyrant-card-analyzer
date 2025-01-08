@@ -65,7 +65,7 @@ def main(args):
 			if card_rarity != None:
 				card_rarity = card_rarity.text
 			if card_rarity != None and args.rarity != None:
-				if int(card_rarity) == args.rarity:
+				if int(card_rarity) in args.rarity:
 					pass
 				else:
 					continue
