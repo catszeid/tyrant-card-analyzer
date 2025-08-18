@@ -25,11 +25,10 @@ def main(args):
 	else:
 		pattern = "^cards_section_\d*.xml$"
 		files = find_files(pattern)
-	input(f"{len(files)} files found. Press enter to continue...")
-	# output results
+	# input(f"{len(files)} files found. Press enter to continue...")
+	
 	results = {}
-	# More args parsing
-	# load xml
+
 	for file in files:
 		print(f"Processing {os.path.join(os.getcwd(), 'data', file)}...")
 		tree = ET.parse(os.path.join(os.getcwd(), 'data', file))
@@ -37,37 +36,30 @@ def main(args):
 		
 		# Iterate over all cards
 		for card in root:
-			if card == None:
+			if card is None:
 				print("Found empty card, skipping...")
 				continue
-			# card id
 			card_id = card.find('id')
-			if card_id != None:
+			if card_id is not None:
 				card_id = card_id.text
 			else:
 				print("Skipping card due to missing id")
-				continue # skip
-			# card name
+				continue
 			card_name = card.find('name')
-			if card_name != None:
+			if card_name is not None:
 				card_name = card_name.text
-			# card set + filtering
 			card_set = card.find('set')
-			if card_set != None:
+			if card_set is not None:
 				card_set = card_set.text
-			if card_set != None and args.set != None:
-				if int(card_set) in args.set:
-					pass
-				else:
+			if card_set is not None and args.set is not None:
+				if int(card_set) not in args.set:
 					continue
 			# card rarity filtering
 			card_rarity = card.find('rarity')
-			if card_rarity != None:
+			if card_rarity is not None:
 				card_rarity = card_rarity.text
-			if card_rarity != None and args.rarity != None:
-				if int(card_rarity) == args.rarity:
-					pass
-				else:
+			if card_rarity is not None and args.rarity is not None:
+				if int(card_rarity) not in args.rarity:
 					continue
 			# card fusion level
 			card_fusion_level = card.find('fusion_level')
@@ -76,28 +68,26 @@ def main(args):
 			else:
 				card_fusion_level = 1
 			if args.fusion_level != None:
-				if int(card_fusion_level) in args.fusion_level:
-					pass
-				else:
+				if int(card_fusion_level) not in args.fusion_level:
 					continue
 			# card cost (Commander have no cost)
-			card_cost = card.find('cost') # convert for scoring
-			if card_cost == None:
+			card_cost = card.find('cost')
+			if card_cost is None:
 				continue # commander analysis will be considered later
-			if card_cost.text != None:
+			if card_cost.text is not None:
 				card_cost = int(card_cost.text)
 			else:
 				print(f"Error: No cost found for {card_id}")
 				continue
 			# card attack (Structure have no attack)
-			card_attack = card.find('attack') # convert attack and health for scoring
-			if card_attack == None:
+			card_attack = card.find('attack')
+			if card_attack is None:
 				pass # Structure have no attack tag
-			if card_attack != None and card_attack.text != None:
+			if card_attack is not None and card_attack.text is not None:
 				card_attack = int(card_attack.text)
 			# card health
 			card_health = card.find('health')
-			if card_health != None and card_health.text != None:
+			if card_health is not None and card_health.text is not None:
 				card_health = int(card_health.text)
 			else:
 				print(f"Error: No health found for {card_id}")
@@ -136,6 +126,7 @@ def main(args):
 					card_skills = []
 					for skill in upgrade.findall('skill'):
 						card_skills.append(skill)
+			# filter skill here TODO
 			# score stats
 			total_stats = card_health
 			if card_attack != None:
@@ -163,11 +154,22 @@ def main(args):
 
 	skill_sorted = sort_by_key_and_fields(results, 'avg_skill', 'adj_stats')
 	print("Sort by Stats + Skill")
+	pageLength = 30
+	if args.page is not None:
+		pageLength = args.page
+	count = 0
+	curPage = 1
 	for key in skill_sorted:
+		if count > pageLength * curPage:
+			if input(f"Page {curPage}... (Enter): Next Page, (Q): Quit") == "q":
+				break
+
+			curPage += 1
+		count += 1
 		print(out_string.format(results[key]['rarity'], results[key]['name'], results[key]['id'], results[key]['adj_stats'], results[key]['avg_skill']))
 
 # Return sorted list of ids given a field
-def sort_by_key_and_field(data, field) -> []:
+def sort_by_key_and_field(data, field) -> list:
 	sorted = []
 	for key in list(data):
 		score = data[key][field]
@@ -182,7 +184,7 @@ def sort_by_key_and_field(data, field) -> []:
 	return sorted
 
 # Return sorted list of ids given multiple fields
-def sort_by_key_and_fields(data, *argv) -> []:
+def sort_by_key_and_fields(data, *argv) -> list:
 	sorted = []
 	for key in list(data):
 		score = 0
@@ -206,10 +208,12 @@ def sort_by_key_and_fields(data, *argv) -> []:
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--set", action="extend", nargs="+", help="Filter by set id", type=int)
+	parser.add_argument("--set", action="extend", nargs="+", help="Filter by set id. ex: 1000 for base set", type=int)
 	parser.add_argument("--rarity", action="extend", nargs="+", help="Filter by rarity (1-6)", type=int)
 	parser.add_argument("-f", "--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
 	parser.add_argument("-fl", "--fusion-level", action="extend", nargs="+", help="Filter by Fusion level (0-2)", type=int)
 	parser.add_argument("--faction", action="extend", nargs="+", help="Whitelist faction(s) (1-6)", type=int)
+	parser.add_argument("--skill", action="extend", nargs="+", help="Require skill. ex: Armor", type=str)
+	parser.add_argument("--page", action="extend", nargs=1, help="Output limit per page", type=int)
 	args = parser.parse_args()
 	main(args)
