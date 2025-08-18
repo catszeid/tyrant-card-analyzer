@@ -94,30 +94,29 @@ def main(args):
 				continue
 			# card type (faction)
 			card_type = card.find('type')
-			if card_type != None:
+			if card_type is not None:
 				card_type = int(card_type.text)
 			else:
 				card_type = 0 # invalid, mapped to None
-			if args.faction != None:
-				if card_type in args.faction:
-					pass
-				else:
+			if args.faction is not None:
+				if card_type not in args.faction:
 					continue
 			# card skills
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
-				if upgrade.find('card_id') != None:
+				if upgrade.find('card_id') is not None:
 					card_id = upgrade.find('card_id').text
-				if upgrade.find('attack') != None:
-					if upgrade.find('attack').text == None: # 47055 has 'attack' with no text
-						print(card_id)
+				if upgrade.find('attack') is not None:
+					if upgrade.find('attack').text is None: # 47055 has 'attack' with no text
+						print(f"Error: Empty attack tag in card {card_id}")
 					else:
 						card_attack = int(upgrade.find('attack').text)
-				if upgrade.find('health') != None:
+				if upgrade.find('health') is not None:
 					card_health = int(upgrade.find('health').text)
-				if upgrade.find('cost') != None:
-					if upgrade.find('cost').text == None:
+				if upgrade.find('cost') is not None:
+					if upgrade.find('cost').text is None:
+						print(f"Error: Empty cost tag in card {card_id}, overriding cost to 0")
 						card_cost = 0
 					else:
 						card_cost = int(upgrade.find('cost').text)
@@ -129,7 +128,7 @@ def main(args):
 			# filter skill here TODO
 			# score stats
 			total_stats = card_health
-			if card_attack != None:
+			if card_attack is not None:
 				total_stats += card_attack
 			adjusted_stats = (total_stats) / (card_cost + 1)
 			# score skills
@@ -154,6 +153,7 @@ def main(args):
 
 	skill_sorted = sort_by_key_and_fields(results, 'avg_skill', 'adj_stats')
 	print("Sort by Stats + Skill")
+	# pagination to prevent overscroll
 	pageLength = 30
 	if args.page is not None:
 		pageLength = args.page
