@@ -68,6 +68,7 @@ def main(args):
 				card_rarity = card_rarity.text
 			if card_rarity is not None and args.rarity is not None:
 				if int(card_rarity) not in args.rarity:
+
 					continue
 			# card fusion level
 			card_fusion_level = card.find('fusion_level')
