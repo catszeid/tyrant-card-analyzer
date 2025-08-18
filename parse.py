@@ -5,9 +5,8 @@ import argparse
 
 import scoring as scor
 
-def find_files(file_pattern):
+def find_files(file_pattern) -> list:
 	dir_contents = os.listdir(os.path.join(os.getcwd(), 'data'))
-	# regex to match xml files
 	pattern = re.compile(file_pattern)
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
 	return match_files
@@ -25,25 +24,34 @@ def main(args):
 	else:
 		pattern = "^cards_section_\d*.xml$"
 		files = find_files(pattern)
-	# input(f"{len(files)} files found. Press enter to continue...")
-	
+
+	ignored_file = find_files("^ignoredcards.xml$")
+	ignored_ids = set()
+	if len(ignored_file) > 0:
+		file = ignored_file[0]
+		tree = ET.parse((os.path.join(os.getcwd(), 'data', file)))
+		root = tree.getroot()
+		for id in root:
+			if id is not None and id.text is not None:
+				ignored_ids.add(id.text)
+
 	results = {}
 
 	for file in files:
-		print(f"Processing {os.path.join(os.getcwd(), 'data', file)}...")
 		tree = ET.parse(os.path.join(os.getcwd(), 'data', file))
 		root = tree.getroot()
 		
-		# Iterate over all cards
 		for card in root:
 			if card is None:
-				print("Found empty card, skipping...")
+				print("Found empty card in {file}, skipping...")
 				continue
 			card_id = card.find('id')
 			if card_id is not None:
+				if card_id.text in ignored_ids:
+					continue
 				card_id = card_id.text
 			else:
-				print("Skipping card due to missing id")
+				print("Skipping card from {file} due to missing id")
 				continue
 			card_name = card.find('name')
 			if card_name is not None:
@@ -77,7 +85,7 @@ def main(args):
 			if card_cost.text is not None:
 				card_cost = int(card_cost.text)
 			else:
-				print(f"Error: No cost found for {card_id}")
+				print(f"Error: No cost found for {card_id} in {file}")
 				continue
 			# card attack (Structure have no attack)
 			card_attack = card.find('attack')
@@ -90,7 +98,7 @@ def main(args):
 			if card_health is not None and card_health.text is not None:
 				card_health = int(card_health.text)
 			else:
-				print(f"Error: No health found for {card_id}")
+				print(f"Error: No health found for {card_id} in {file}")
 				continue
 			# card type (faction)
 			card_type = card.find('type')
@@ -109,14 +117,14 @@ def main(args):
 					card_id = upgrade.find('card_id').text
 				if upgrade.find('attack') is not None:
 					if upgrade.find('attack').text is None: # 47055 has 'attack' with no text
-						print(f"Error: Empty attack tag in card {card_id}")
+						print(f"Error: Empty attack tag in card {card_id} in {file}")
 					else:
 						card_attack = int(upgrade.find('attack').text)
 				if upgrade.find('health') is not None:
 					card_health = int(upgrade.find('health').text)
 				if upgrade.find('cost') is not None:
 					if upgrade.find('cost').text is None:
-						print(f"Error: Empty cost tag in card {card_id}, overriding cost to 0")
+						print(f"Error: Empty cost tag for card {card_id} in {file}, overriding cost to 0")
 						card_cost = 0
 					else:
 						card_cost = int(upgrade.find('cost').text)
@@ -184,6 +192,7 @@ def sort_by_key_and_field(data, field) -> list:
 	return sorted
 
 # Return sorted list of ids given multiple fields
+# TODO improve sorting algorithm
 def sort_by_key_and_fields(data, *argv) -> list:
 	sorted = []
 	for key in list(data):
@@ -213,7 +222,7 @@ if __name__ == "__main__":
 	parser.add_argument("-f", "--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
 	parser.add_argument("-fl", "--fusion-level", action="extend", nargs="+", help="Filter by Fusion level (0-2)", type=int)
 	parser.add_argument("--faction", action="extend", nargs="+", help="Whitelist faction(s) (1-6)", type=int)
-	parser.add_argument("--skill", action="extend", nargs="+", help="Require skill. ex: Armor", type=str)
+	# TODO skill filter
 	parser.add_argument("--page", action="extend", nargs=1, help="Output limit per page", type=int)
 	args = parser.parse_args()
 	main(args)

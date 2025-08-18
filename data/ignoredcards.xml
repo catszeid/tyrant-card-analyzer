@@ -1,0 +1,44 @@
+<root>
+    <!-- Cards listed should be ignored by the parser by id -->
+    <!-- Raid -->
+    <id>1855</id>
+    <id>31827</id>
+    <id>8774</id>
+    <id>8784</id>
+    <id>31837</id>
+    <id>31847</id>
+    <id>31857</id>
+    <id>25486</id>
+    <id>18262</id>
+    <id>48130</id>
+    <id>48140</id>
+    <id>48150</id>
+    <id>48160</id>
+    <id>26602</id>
+    <id>19436</id>
+    <id>19446</id>
+    <id>19456</id>
+    <id>19466</id>
+    <id>19476</id>
+    <id>19486</id>
+    <id>19496</id>
+    <id>19506</id>
+    <id>19516</id>
+    <id>19526</id>
+    <id>68466</id>
+    <id>68476</id>
+    <id>68486</id>
+    <id>68487</id>
+    <id>68488</id>
+    <id>68489</id>
+    <id>68490</id>
+    <id>68491</id>
+    <id>68492</id>
+    <id>68493</id>
+    <id>68494</id>
+    <id>68495</id>
+    <id>68496</id>
+    <id>68497</id>
+    <id>68498</id>
+    <id>68499</id>
+</root>
