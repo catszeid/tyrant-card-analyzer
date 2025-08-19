@@ -22,7 +22,7 @@ def main(args):
 			else:
 				print(f"Failed to find {file}")
 	else:
-		pattern = "^cards_section_\d*.xml$"
+		pattern = "^cards_section_\\d+.xml$"
 		files = find_files(pattern)
 
 	ignored_file = find_files("^ignoredcards.xml$")
@@ -47,38 +47,47 @@ def main(args):
 				continue
 			card_id = card.find('id')
 			if card_id is not None:
+				# id ignore, note the id should target base card, not upgrade
 				if card_id.text in ignored_ids:
 					continue
 				card_id = card_id.text
 			else:
-				print("Skipping card from {file} due to missing id")
+				print(f"Warning: Card {card_id} in {file} has no card_id")
 				continue
 			card_name = card.find('name')
-			if card_name is not None:
+			if card_name is not None and card_name.text is not None:
 				card_name = card_name.text
+			else:
+				print(f"Warning: Card {card_id} in {file} has no name")
+				continue
 			card_set = card.find('set')
-			if card_set is not None:
+			if card_set is not None and card_set.text is not None:
 				card_set = card_set.text
-			if card_set is not None and args.set is not None:
-				if int(card_set) not in args.set:
-					continue
+			else:
+				print(f"Warning: Card {card_id} in {file} does not have a set")
+				continue
+			if args.set is not None and int(card_set) not in args.set:
+				continue
+			
 			# card rarity filtering
 			card_rarity = card.find('rarity')
 			if card_rarity is not None:
-				card_rarity = card_rarity.text
-			if card_rarity is not None and args.rarity is not None:
-				if int(card_rarity) not in args.rarity:
-
+				if card_rarity.text is not None:
+					card_rarity = card_rarity.text
+				else:
+					print(f"Warning: Card {card_id} in {file} has no rarity")
 					continue
+				if args.rarity is not None and int(card_rarity) not in args.rarity:
+					continue
+				
 			# card fusion level
 			card_fusion_level = card.find('fusion_level')
-			if card_fusion_level != None:
+			if card_fusion_level is not None and card_fusion_level.text is not None:
 				card_fusion_level = int(card_fusion_level.text)
 			else:
-				card_fusion_level = 1
-			if args.fusion_level != None:
-				if int(card_fusion_level) not in args.fusion_level:
-					continue
+				card_fusion_level = 0
+			if args.fusion_level is not None and int(card_fusion_level) not in args.fusion_level:
+				continue
 			# card cost (Commander have no cost)
 			card_cost = card.find('cost')
 			if card_cost is None:
@@ -86,12 +95,10 @@ def main(args):
 			if card_cost.text is not None:
 				card_cost = int(card_cost.text)
 			else:
-				print(f"Error: No cost found for {card_id} in {file}")
+				print(f"Warning: Card {card_id} in {file} has no cost")
 				continue
 			# card attack (Structure have no attack)
 			card_attack = card.find('attack')
-			if card_attack is None:
-				pass # Structure have no attack tag
 			if card_attack is not None and card_attack.text is not None:
 				card_attack = int(card_attack.text)
 			# card health
@@ -99,18 +106,18 @@ def main(args):
 			if card_health is not None and card_health.text is not None:
 				card_health = int(card_health.text)
 			else:
-				print(f"Error: No health found for {card_id} in {file}")
+				print(f"Warning: Card {card_id} in {file} has no health")
 				continue
 			# card type (faction)
 			card_type = card.find('type')
-			if card_type is not None:
+			if card_type is not None and card_type.text is not None:
 				card_type = int(card_type.text)
 			else:
-				card_type = 0 # invalid, mapped to None
-			if args.faction is not None:
-				if card_type not in args.faction:
-					continue
-			# card skills
+				print(f"Warning: Card {card_id} in {file} has no type")
+				continue
+			if args.faction is not None and card_type not in args.faction:
+				continue
+			
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
@@ -118,15 +125,14 @@ def main(args):
 					card_id = upgrade.find('card_id').text
 				if upgrade.find('attack') is not None:
 					if upgrade.find('attack').text is None: # 47055 has 'attack' with no text
-						print(f"Error: Empty attack tag in card {card_id} in {file}")
+						print(f"Warning: Empty attack tag in card {card_id} in {file}")
 					else:
 						card_attack = int(upgrade.find('attack').text)
 				if upgrade.find('health') is not None:
 					card_health = int(upgrade.find('health').text)
 				if upgrade.find('cost') is not None:
 					if upgrade.find('cost').text is None:
-						print(f"Error: Empty cost tag for card {card_id} in {file}, overriding cost to 0")
-						card_cost = 0
+						print(f"Warning: Card {card_id} in {file} has empty cost field")
 					else:
 						card_cost = int(upgrade.find('cost').text)
 				if len(upgrade.findall('skill')) != 0:
