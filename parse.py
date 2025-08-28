@@ -182,9 +182,6 @@ def main(args):
 				final_skills.append(scor.skill_to_string(skill))
 			if len(final_skills) > 0:
 				avg_skill_score = skill_score / len(final_skills)
-			# card_result = "[{:5}]{} [{:.5}]({}) - [{:.5}]"
-			# card_result += " {}"*len(card_skills)
-			# print(card_result.format(card_id, card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
 
 			# dictionary holding name, rarity, cost, adjusted stats, avg skill score
 			results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
