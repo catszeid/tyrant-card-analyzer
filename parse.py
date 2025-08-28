@@ -5,12 +5,35 @@ import argparse
 
 import scoring as scor
 
-def find_files(file_pattern):
+def find_files(file_pattern) -> list:
 	dir_contents = os.listdir(os.path.join(os.getcwd(), 'data'))
-	# regex to match xml files
 	pattern = re.compile(file_pattern)
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
 	return match_files
+
+def heapify_by_score(arr, n, i):
+	largest = i
+	left = 2 * i + 1
+	right = 2 * i + 2
+
+	if left < n and arr[left][1] > arr[largest][1]:
+		largest = left
+	if right < n and arr[right][1] > arr[largest][1]:
+		largest = right
+	
+	if largest != i:
+		arr[i], arr[largest] = arr[largest], arr[i]
+		heapify_by_score(arr, n, largest)
+
+def heap_sort(arr):
+	n = len(arr)
+
+	for i in range(n//2 - 1, -1, -1):
+		heapify_by_score(arr, n, i)
+	
+	for i in range(n - 1, 0, -1):
+		arr[i], arr[0] = arr[0], arr[i]
+		heapify_by_score(arr, i, 0)
 
 def main(args):
 	# file gathering
@@ -23,89 +46,119 @@ def main(args):
 			else:
 				print(f"Failed to find {file}")
 	else:
-		pattern = "^cards_section_\d*.xml$"
+		pattern = "^cards_section_\\d+.xml$"
 		files = find_files(pattern)
-	input(f"{len(files)} files found. Press enter to continue...")
-	# output results
+
+	ignored_file = find_files("^ignoredcards.xml$")
+	ignored_ids = set()
+	if len(ignored_file) > 0:
+		file = ignored_file[0]
+		tree = ET.parse((os.path.join(os.getcwd(), 'data', file)))
+		root = tree.getroot()
+		for id in root:
+			if id is not None and id.text is not None:
+				ignored_ids.add(id.text)
+
 	results = {}
-	# load xml
+
 	for file in files:
-		print(f"Processing {os.path.join(os.getcwd(), 'data', file)}...")
 		tree = ET.parse(os.path.join(os.getcwd(), 'data', file))
 		root = tree.getroot()
 		
-		# Iterate over all cards
 		for card in root:
-			if card == None:
-				print("Found empty card, skipping...")
+			if card is None:
+				print("Found empty card in {file}, skipping...")
 				continue
-			# card id
 			card_id = card.find('id')
-			if card_id != None:
+			if card_id is not None:
+				# id ignore, note the id should target base card, not upgrade
+				if card_id.text in ignored_ids:
+					continue
 				card_id = card_id.text
 			else:
-				print("Skipping card due to missing id")
-				continue # skip
-			# card name
+				print(f"Warning: Card {card_id} in {file} has no card_id")
+				continue
 			card_name = card.find('name')
-			if card_name != None:
+			if card_name is not None and card_name.text is not None:
 				card_name = card_name.text
-			# card set + filtering
+			else:
+				print(f"Warning: Card {card_id} in {file} has no name")
+				continue
 			card_set = card.find('set')
-			if card_set != None:
+			if card_set is not None and card_set.text is not None:
 				card_set = card_set.text
-			if card_set != None and args.set != None:
-				if int(card_set) == args.set:
-					pass
-				else:
-					continue
+			else:
+				print(f"Warning: Card {card_id} in {file} does not have a set")
+				continue
+			if args.set is not None and int(card_set) not in args.set:
+				continue
+			
 			# card rarity filtering
 			card_rarity = card.find('rarity')
-			if card_rarity != None:
-				card_rarity = card_rarity.text
-			if card_rarity != None and args.rarity != None:
-				if int(card_rarity) == args.rarity:
-					pass
+			if card_rarity is not None:
+				if card_rarity.text is not None:
+					card_rarity = card_rarity.text
 				else:
+					print(f"Warning: Card {card_id} in {file} has no rarity")
 					continue
+				if args.rarity is not None and int(card_rarity) not in args.rarity:
+					continue
+				
+			# card fusion level
+			card_fusion_level = card.find('fusion_level')
+			if card_fusion_level is not None and card_fusion_level.text is not None:
+				card_fusion_level = int(card_fusion_level.text)
+			else:
+				card_fusion_level = 0
+			if args.fusion_level is not None and int(card_fusion_level) not in args.fusion_level:
+				continue
 			# card cost (Commander have no cost)
-			card_cost = card.find('cost') # convert for scoring
-			if card_cost == None:
+			card_cost = card.find('cost')
+			if card_cost is None:
 				continue # commander analysis will be considered later
-			if card_cost.text != None:
+			if card_cost.text is not None:
+				if args.cost is not None and int(card_cost.text) not in args.cost:
+					continue
 				card_cost = int(card_cost.text)
 			else:
-				print(f"Error: No cost found for {card_id}")
+				print(f"Warning: Card {card_id} in {file} has no cost")
 				continue
 			# card attack (Structure have no attack)
-			card_attack = card.find('attack') # convert attack and health for scoring
-			if card_attack == None:
-				pass # Structure have no attack tag
-			if card_attack != None and card_attack.text != None:
+			card_attack = card.find('attack')
+			if card_attack is not None and card_attack.text is not None:
 				card_attack = int(card_attack.text)
 			# card health
 			card_health = card.find('health')
-			if card_health != None and card_health.text != None:
+			if card_health is not None and card_health.text is not None:
 				card_health = int(card_health.text)
 			else:
-				print(f"Error: No health found for {card_id}")
+				print(f"Warning: Card {card_id} in {file} has no health")
 				continue
-			# card skills
+			# card type (faction)
+			card_type = card.find('type')
+			if card_type is not None and card_type.text is not None:
+				card_type = int(card_type.text)
+			else:
+				print(f"Warning: Card {card_id} in {file} has no type")
+				continue
+			if args.faction is not None and card_type not in args.faction:
+				continue
+			
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
-				if upgrade.find('card_id') != None:
+				if upgrade.find('card_id') is not None:
 					card_id = upgrade.find('card_id').text
-				if upgrade.find('attack') != None:
-					if upgrade.find('attack').text == None: # 47055 has 'attack' with no text
-						print(card_id)
+				if upgrade.find('attack') is not None:
+					if upgrade.find('attack').text is None: # 47055 has 'attack' with no text
+						print(f"Warning: Empty attack tag in card {card_id} in {file}")
 					else:
 						card_attack = int(upgrade.find('attack').text)
-				if upgrade.find('health') != None:
+				if upgrade.find('health') is not None:
 					card_health = int(upgrade.find('health').text)
-				if upgrade.find('cost') != None:
-					if upgrade.find('cost').text == None:
-						card_cost = 0
+				if upgrade.find('cost') is not None:
+					if upgrade.find('cost').text is None:
+						print(f"Warning: Card {card_id} in {file} has empty cost field")
 					else:
 						card_cost = int(upgrade.find('cost').text)
 				if len(upgrade.findall('skill')) != 0:
@@ -113,9 +166,10 @@ def main(args):
 					card_skills = []
 					for skill in upgrade.findall('skill'):
 						card_skills.append(skill)
+			# filter skill here TODO
 			# score stats
 			total_stats = card_health
-			if card_attack != None:
+			if card_attack is not None:
 				total_stats += card_attack
 			adjusted_stats = (total_stats) / (card_cost + 1)
 			# score skills
@@ -128,9 +182,6 @@ def main(args):
 				final_skills.append(scor.skill_to_string(skill))
 			if len(final_skills) > 0:
 				avg_skill_score = skill_score / len(final_skills)
-			# card_result = "[{:5}]{} [{:.5}]({}) - [{:.5}]"
-			# card_result += " {}"*len(card_skills)
-			# print(card_result.format(card_id, card_name, adjusted_stats, card_cost, avg_skill_score, *final_skills))
 
 			# dictionary holding name, rarity, cost, adjusted stats, avg skill score
 			results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
@@ -138,53 +189,56 @@ def main(args):
 	out_string = "[{}] {} ({}) - {:.5} / {:.5}"
 	# rarity, name, id, adjusted stats, avg skill score
 
-	skill_sorted = sort_by_key_and_fields(results, 'avg_skill', 'adj_stats')
+	# score and sort each card for overall skill and stats
+	score_by_fields(results, 'avg_skill', 'adj_stats')
+	skill_sorted = sort_scored_results(results)
+
+
 	print("Sort by Stats + Skill")
-	for key in skill_sorted:
-		print(out_string.format(results[key]['rarity'], results[key]['name'], results[key]['id'], results[key]['adj_stats'], results[key]['avg_skill']))
+	# pagination to prevent overscroll
+	pageLength = 30
+	if args.page is not None:
+		pageLength = args.page
+	count = 0
+	curPage = 1
+	# Step through sorted highest to lowest
+	for i in range(len(skill_sorted) - 1, -1, -1):
+		if count > pageLength * curPage:
+			if input(f"Page {curPage}... (Enter): Next Page, (Q): Quit") == "q":
+				break
 
-# Return sorted list of ids given a field
-def sort_by_key_and_field(data, field) -> []:
-	sorted = []
-	for key in list(data):
-		score = data[key][field]
-		sorted.append(key)
-		index = len(sorted)-1
-		while index > 0 and data[sorted[index-1]][field] < score:
-			# swap elements
-			sorted[index] = sorted[index - 1]
-			sorted[index-1] = key
-			# decrement index
-			index -= 1
-	return sorted
+			curPage += 1
+		count += 1
+		val = results[skill_sorted[i][0]]
+		print(out_string.format(val['rarity'], val['name'], val['id'], val['adj_stats'],val['avg_skill']))
 
-# Return sorted list of ids given multiple fields
-def sort_by_key_and_fields(data, *argv) -> []:
-	sorted = []
-	for key in list(data):
+def score_by_fields(data, *argv):
+	for key in data:
 		score = 0
 		for arg in argv:
 			score += data[key][arg]
-		sorted.append(key)
-		index = len(sorted)-1
-		while index > 0:
-			o_score = 0
-			for arg in argv:
-				o_score += data[sorted[index-1]][arg]
-			if o_score < score:
-				# swap elements
-				sorted[index] = sorted[index - 1]
-				sorted[index-1] = key
-				# decrement index
-				index -= 1
-			else:
-				break
+		data[key]['score'] = score
+
+# sort in ascending order
+def sort_scored_results(data) -> list:
+	sorted = []
+	for key in data:
+		score = data[key]['score']
+		id = key
+		sorted.append((id, score))
+	heap_sort(sorted)
+
 	return sorted
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--set", help="filter by set", type=int)
-	parser.add_argument("--rarity", help="filter by rarity (1-6)", type=int)
-	parser.add_argument("-f", "--file", action="extend", nargs="+", help="select file. Load all by default", type=str)
+	parser.add_argument("--set", action="extend", nargs="+", help="Filter by set id. ex: 1000 for base set", type=int)
+	parser.add_argument("--rarity", action="extend", nargs="+", help="Filter by rarity (1-6)", type=int)
+	parser.add_argument("--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
+	parser.add_argument("-fl", "--fusion-level", action="extend", nargs="+", help="Filter by Fusion level (0-2)", type=int)
+	parser.add_argument("--faction", action="extend", nargs="+", help="Whitelist faction(s) (1-6)", type=int)
+	parser.add_argument("-c", "--cost", action="extend", nargs="+", help="Filter by cost. ex: 0 for all 0 cost", type=int)
+	# TODO skill filter
+	parser.add_argument("--page", action="extend", nargs=1, help="Output limit per page", type=int)
 	args = parser.parse_args()
 	main(args)

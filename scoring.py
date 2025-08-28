@@ -5,7 +5,6 @@ from vars import SKILLS, SKILLS_PRETTY, TYPES
 # Score a skill's budget
 def score_skill(skill) -> int:
 	id = skill.get('id')
-	s_name = SKILLS_PRETTY[SKILLS.index(id)]
 	score = 0
 	if id == 'jam' or id == 'flurry': # complex pricing, see below
 		s_n = skill.get('n')
@@ -73,6 +72,8 @@ def score_skill(skill) -> int:
 		score += s_x * 1 # check rate
 	else: # default 1:1 budgeting
 		if id in SKILLS:
+			score = int(skill.get('x'))
+		elif id == "Leech": # card 60035 has "pretty" id
 			score = int(skill.get('x'))
 		else:
 			print("Unknown")
