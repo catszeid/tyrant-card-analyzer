@@ -117,6 +117,8 @@ def main(args):
 			if card_cost is None:
 				continue # commander analysis will be considered later
 			if card_cost.text is not None:
+				if int(card_cost.text) not in args.cost:
+					continue
 				card_cost = int(card_cost.text)
 			else:
 				print(f"Warning: Card {card_id} in {file} has no cost")
@@ -238,6 +240,7 @@ if __name__ == "__main__":
 	parser.add_argument("-f", "--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
 	parser.add_argument("-fl", "--fusion-level", action="extend", nargs="+", help="Filter by Fusion level (0-2)", type=int)
 	parser.add_argument("--faction", action="extend", nargs="+", help="Whitelist faction(s) (1-6)", type=int)
+	parser.add_argument("-c", "--cost", action="extend", nargs="+", help="Filter by cost. ex: 0 for all 0 cost", type=int)
 	# TODO skill filter
 	parser.add_argument("--page", action="extend", nargs=1, help="Output limit per page", type=int)
 	args = parser.parse_args()
