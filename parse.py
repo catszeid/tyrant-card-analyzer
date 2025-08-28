@@ -117,7 +117,7 @@ def main(args):
 			if card_cost is None:
 				continue # commander analysis will be considered later
 			if card_cost.text is not None:
-				if int(card_cost.text) not in args.cost:
+				if args.cost is not None and int(card_cost.text) not in args.cost:
 					continue
 				card_cost = int(card_cost.text)
 			else:
