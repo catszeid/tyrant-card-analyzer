@@ -237,7 +237,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--set", action="extend", nargs="+", help="Filter by set id. ex: 1000 for base set", type=int)
 	parser.add_argument("--rarity", action="extend", nargs="+", help="Filter by rarity (1-6)", type=int)
-	parser.add_argument("-f", "--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
+	parser.add_argument("--file", action="extend", nargs="+", help="Select file from data. Load all by default", type=str)
 	parser.add_argument("-fl", "--fusion-level", action="extend", nargs="+", help="Filter by Fusion level (0-2)", type=int)
 	parser.add_argument("--faction", action="extend", nargs="+", help="Whitelist faction(s) (1-6)", type=int)
 	parser.add_argument("-c", "--cost", action="extend", nargs="+", help="Filter by cost. ex: 0 for all 0 cost", type=int)
