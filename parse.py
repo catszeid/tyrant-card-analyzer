@@ -11,6 +11,30 @@ def find_files(file_pattern) -> list:
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
 	return match_files
 
+def heapify_by_score(arr, n, i):
+	largest = i
+	left = 2 * i + 1
+	right = 2 * i + 2
+
+	if left < n and arr[left][1] > arr[largest][1]:
+		largest = left
+	if right < n and arr[right][1] > arr[largest][1]:
+		largest = right
+	
+	if largest != i:
+		arr[i], arr[largest] = arr[largest], arr[i]
+		heapify_by_score(arr, n, largest)
+
+def heap_sort(arr):
+	n = len(arr)
+
+	for i in range(n//2 - 1, -1, -1):
+		heapify_by_score(arr, n, i)
+	
+	for i in range(n - 1, 0, -1):
+		arr[i], arr[0] = arr[0], arr[i]
+		heapify_by_score(arr, i, 0)
+
 def main(args):
 	# file gathering
 	files = []
@@ -166,7 +190,11 @@ def main(args):
 	out_string = "[{}] {} ({}) - {:.5} / {:.5}"
 	# rarity, name, id, adjusted stats, avg skill score
 
-	skill_sorted = sort_by_key_and_fields(results, 'avg_skill', 'adj_stats')
+	# score and sort each card for overall skill and stats
+	score_by_fields(results, 'avg_skill', 'adj_stats')
+	skill_sorted = sort_scored_results(results)
+
+
 	print("Sort by Stats + Skill")
 	# pagination to prevent overscroll
 	pageLength = 30
@@ -174,52 +202,33 @@ def main(args):
 		pageLength = args.page
 	count = 0
 	curPage = 1
-	for key in skill_sorted:
+	# Step through sorted highest to lowest
+	for i in range(len(skill_sorted) - 1, -1, -1):
 		if count > pageLength * curPage:
 			if input(f"Page {curPage}... (Enter): Next Page, (Q): Quit") == "q":
 				break
 
 			curPage += 1
 		count += 1
-		print(out_string.format(results[key]['rarity'], results[key]['name'], results[key]['id'], results[key]['adj_stats'], results[key]['avg_skill']))
+		val = results[skill_sorted[i][0]]
+		print(out_string.format(val['rarity'], val['name'], val['id'], val['adj_stats'],val['avg_skill']))
 
-# Return sorted list of ids given a field
-def sort_by_key_and_field(data, field) -> list:
-	sorted = []
-	for key in list(data):
-		score = data[key][field]
-		sorted.append(key)
-		index = len(sorted)-1
-		while index > 0 and data[sorted[index-1]][field] < score:
-			# swap elements
-			sorted[index] = sorted[index - 1]
-			sorted[index-1] = key
-			# decrement index
-			index -= 1
-	return sorted
-
-# Return sorted list of ids given multiple fields
-# TODO improve sorting algorithm
-def sort_by_key_and_fields(data, *argv) -> list:
-	sorted = []
-	for key in list(data):
+def score_by_fields(data, *argv):
+	for key in data:
 		score = 0
 		for arg in argv:
 			score += data[key][arg]
-		sorted.append(key)
-		index = len(sorted)-1
-		while index > 0:
-			o_score = 0
-			for arg in argv:
-				o_score += data[sorted[index-1]][arg]
-			if o_score < score:
-				# swap elements
-				sorted[index] = sorted[index - 1]
-				sorted[index-1] = key
-				# decrement index
-				index -= 1
-			else:
-				break
+		data[key]['score'] = score
+
+# sort in ascending order
+def sort_scored_results(data) -> list:
+	sorted = []
+	for key in data:
+		score = data[key]['score']
+		id = key
+		sorted.append((id, score))
+	heap_sort(sorted)
+
 	return sorted
 
 if __name__ == "__main__":
