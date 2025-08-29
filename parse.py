@@ -41,18 +41,18 @@ def sort_scored_results(data) -> list:
 	return sorted
 
 # Find files matching the regex pattern
-def find_files(file_pattern) -> list:
-	dir_contents = os.listdir(os.path.join(os.getcwd(), 'data'))
+def find_files(file_pattern, folder='data') -> list:
+	dir_contents = os.listdir(os.path.join(os.getcwd(), folder))
 	pattern = re.compile(file_pattern)
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
 	return match_files
 
 # get the list of data files to read for cards
 # When files is None, it will search for all files matching the default naming scheme
-def get_files(files=None) -> list:
+def get_files(files=None, folder='data') -> list:
 	fileList = []
 	if files is not None:
-		dir_contents = os.listdir(os.path.join(os.getcwd(), 'data'))
+		dir_contents = os.listdir(os.path.join(os.getcwd(), folder))
 		for file in files:
 			if file in dir_contents:
 				fileList.append(file)
@@ -60,17 +60,17 @@ def get_files(files=None) -> list:
 				print(f"Failed to find {file}")
 	else:
 		pattern = "^cards_section_\\d+.xml$"
-		fileList = find_files(pattern)
+		fileList = find_files(pattern, folder)
 
 	return fileList
 
-def get_ignored_list() -> set:
+def get_ignored_list(folder='data') -> set:
 	# ignore ids Block
 	ignored_file = find_files("^ignoredcards.xml$")
 	ignored_ids = set()
 	if len(ignored_file) > 0:
 		file = ignored_file[0]
-		tree = ET.parse((os.path.join(os.getcwd(), 'data', file)))
+		tree = ET.parse((os.path.join(os.getcwd(), folder, file)))
 		root = tree.getroot()
 		for id in root:
 			if id is not None and id.text is not None:
@@ -85,13 +85,15 @@ def score_by_fields(data, *argv):
 		data[key]['score'] = score
 
 # parse files for cards with the given arguments
-def parse_cards(files: list, args) -> dict:
+def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 	results = {}
 
-	ignored_ids = get_ignored_list()
+	ignored_ids = {}
+	if ignore:
+		ignored_ids = get_ignored_list()
 
 	for file in files:
-		tree = ET.parse(os.path.join(os.getcwd(), 'data', file))
+		tree = ET.parse(os.path.join(os.getcwd(), folder, file))
 		root = tree.getroot()
 		
 		for card in root:
@@ -242,16 +244,14 @@ def print_results_paginated(data, pageLength=30):
 def main(args):
 	files = get_files(args.file)
 
-	cards = parse_cards(files, args)
+	cards = parse_cards(files, args, ignore=True)
 	print(f"{len(cards)} cards found!")
 
-	pageLen = 30
-	if args.page is not None:
-		pageLen = args.page
+	pageLen = args.page if args.page is not None else 30
 
 	print_results_paginated(cards, pageLen)
 
-if __name__ == "__main__":
+def setup_argparser():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--set", action="extend", nargs="+", help="Filter by set id. ex: 1000 for base set", type=int)
 	parser.add_argument("--rarity", action="extend", nargs="+", help="Filter by rarity (1-6)", type=int)
@@ -261,5 +261,9 @@ if __name__ == "__main__":
 	parser.add_argument("-c", "--cost", action="extend", nargs="+", help="Filter by cost. ex: 0 for all 0 cost", type=int)
 	# TODO skill filter
 	parser.add_argument("--page", action="extend", nargs=1, help="Output limit per page", type=int)
+	return parser
+
+if __name__ == "__main__":
+	parser = setup_argparser()
 	args = parser.parse_args()
 	main(args)

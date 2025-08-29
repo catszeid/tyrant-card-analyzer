@@ -1,0 +1,52 @@
+<root>
+    <unit>
+    <id>1</id>
+    <name>Infantry</name>
+    <picture>basicinfantry.jpg</picture>
+    <attack>1</attack>
+    <health>6</health>
+    <cost>0</cost>
+    <rarity>1</rarity>
+    <type>1</type>
+    <set>1000</set>
+    <upgrade>
+      <level>2</level>
+      <card_id>2</card_id>
+      <attack>2</attack>
+      <health>9</health>
+    </upgrade>
+    <upgrade>
+      <level>3</level>
+      <picture>basicinfantry_lv3.jpg</picture>
+      <card_id>3</card_id>
+      <attack>3</attack>
+      <health>12</health>
+    </upgrade>
+    </unit>
+    <unit>
+        <id>4</id>
+        <name>Bazooka Marine</name>
+        <picture>bazookamarine.jpg</picture>
+        <attack>3</attack>
+        <health>9</health>
+        <cost>1</cost>
+        <rarity>1</rarity>
+        <skill id="pierce" x="5"/>
+        <type>1</type>
+        <set>1000</set>
+    <upgrade>
+      <level>2</level>
+      <card_id>350</card_id>
+      <attack>5</attack>
+      <health>14</health>
+      <skill id="pierce" x="7"/>
+    </upgrade>
+    <upgrade>
+      <level>3</level>
+      <card_id>351</card_id>
+      <attack>6</attack>
+      <health>18</health>
+      <skill id="pierce" x="10"/>
+    </upgrade>
+  </unit>
+</root>
