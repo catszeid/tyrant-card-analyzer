@@ -22,18 +22,18 @@
       <attack>3</attack>
       <health>12</health>
     </upgrade>
-    </unit>
-    <unit>
-        <id>4</id>
-        <name>Bazooka Marine</name>
-        <picture>bazookamarine.jpg</picture>
-        <attack>3</attack>
-        <health>9</health>
-        <cost>1</cost>
-        <rarity>1</rarity>
-        <skill id="pierce" x="5"/>
-        <type>1</type>
-        <set>1000</set>
+  </unit>
+  <unit>
+    <id>4</id>
+    <name>Bazooka Marine</name>
+    <picture>bazookamarine.jpg</picture>
+    <attack>3</attack>
+    <health>9</health>
+    <cost>1</cost>
+    <rarity>1</rarity>
+    <skill id="pierce" x="5"/>
+    <type>1</type>
+    <set>1000</set>
     <upgrade>
       <level>2</level>
       <card_id>350</card_id>
