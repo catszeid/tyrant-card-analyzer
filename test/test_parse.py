@@ -199,3 +199,11 @@ class TestParse:
         assert cards == target
 
     # Cost filter
+    def test_parse_cards_faction_2(self):
+        target = {}
+        files = parse.find_files('^test_data_2.xml$', folder=self.test_folder)
+        parser = parse.setup_argparser()
+        args = parser.parse_args()
+        args.faction = [2]
+        cards = parse.parse_cards(files, args, folder=self.test_folder)
+        assert cards == target
