@@ -1,4 +1,4 @@
-from vars import SKILLS, SKILLS_PRETTY, TYPES
+from src.vars import SKILLS, SKILLS_PRETTY, TYPES
 
 # Scoring functions to process card values
 
