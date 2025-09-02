@@ -1,7 +1,7 @@
 import pytest
 import xml.etree.ElementTree as ET
 
-import scoring as s
+import src.scoring as s
 class TestSkill:
 	def test_rally_score(self):
 		target = 10

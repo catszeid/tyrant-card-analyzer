@@ -3,7 +3,7 @@ import os
 import re
 import argparse
 
-import scoring as scor
+import src.scoring as scor
 
 def heapify_by_score(arr, n, i):
 	largest = i
@@ -83,6 +83,22 @@ def score_by_fields(data, *argv):
 		for arg in argv:
 			score += data[key][arg]
 		data[key]['score'] = score
+
+def get_card_tag(tag: str, arg):
+	val = card.find(tag)
+	if val is not None:
+		if val.text is not None:
+			val = val.text
+		else:
+			if tag == "id":
+				print(f"Warning: Card has no id")
+			print(f"Warning: Card {card_id} in {file} has no {tag}")
+			return None
+		if arg is not None and int(val) not in arg:
+			return None
+	else:
+		# skip
+		return None
 
 # parse files for cards with the given arguments
 def parse_cards(files: list, args, folder='data', ignore=True) -> dict:

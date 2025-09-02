@@ -1,8 +1,8 @@
-import parse
+from src import parse
 import random
 
 class TestParse:
-    test_folder = 'test'
+    test_folder = 'tests'
 
     def test_heap_sort(self):
         random.seed(124)
