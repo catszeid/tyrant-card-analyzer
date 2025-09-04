@@ -215,7 +215,7 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				avg_skill_score = skill_score / len(final_skills)
 
 			# dictionary holding name, rarity, cost, adjusted stats, avg skill score
-			results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+			results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 'type': card_type, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
 	return results
 
 def print_results_paginated(data, pageLength=30):
