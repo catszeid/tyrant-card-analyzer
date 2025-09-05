@@ -79,10 +79,35 @@ def get_ignored_list(folder='data') -> set:
 
 def score_by_fields(data, *argv):
 	for key in data:
-		score = 0
-		for arg in argv:
-			score += data[key][arg]
+		try:
+			score = 0
+			for arg in argv:
+				score += data[key][arg]
+		except:
+			print(data[key])
 		data[key]['score'] = score
+
+def avg_card_stats(c_health: int, c_attack: int | None, c_cost: int) -> float:
+	sum = c_health
+	if c_attack is not None:
+		sum += c_attack
+	return sum / (c_cost + 1)
+
+def avg_card_skill(c_skills: list) -> float:
+	score = 0
+	count = 0
+	for skill in c_skills:
+		score += scor.score_skill(skill)
+		count += 1
+	if count > 0:
+		score = score / count
+	return score
+	
+def readable_skills(c_skills: list) -> list:
+	skill_out = []
+	for skill in c_skills:
+		skill_out.append(scor.skill_to_string(skill))
+	return skill_out
 
 # parse files for cards with the given arguments
 def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
@@ -174,12 +199,23 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				continue
 			if args.faction is not None and card_type not in args.faction:
 				continue
+		
+			card_level = 1
 			
 			card_skills = card.findall('skill') # list of 'skill' Elements
+			adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
+			avg_skill_score = avg_card_skill(card_skills)
+			final_skills = readable_skills(card_skills)
+
+			results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'level': card_level, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
+				# type (faction) and rarity should not change as part of an upgrade
 				if upgrade.find('card_id') is not None:
 					card_id = upgrade.find('card_id').text
+				if upgrade.find('level') is not None:
+					card_level = upgrade.find('level').text
 				if upgrade.find('attack') is not None:
 					if upgrade.find('attack').text is None: # 47055 has 'attack' with no text
 						print(f"Warning: Empty attack tag in card {card_id} in {file}")
@@ -197,25 +233,13 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 					card_skills = []
 					for skill in upgrade.findall('skill'):
 						card_skills.append(skill)
-			# filter skill here TODO
-			# score stats
-			total_stats = card_health
-			if card_attack is not None:
-				total_stats += card_attack
-			adjusted_stats = (total_stats) / (card_cost + 1)
-			# score skills
-			skill_score = 0
-			avg_skill_score = 0.0
-			# convert skills from Element to readable string
-			final_skills = []
-			for skill in card_skills:
-				skill_score += scor.score_skill(skill)
-				final_skills.append(scor.skill_to_string(skill))
-			if len(final_skills) > 0:
-				avg_skill_score = skill_score / len(final_skills)
-
-			# dictionary holding name, rarity, cost, adjusted stats, avg skill score
-			results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 'type': card_type, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+				
+				# add each upgrade to database
+				adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
+				avg_skill_score = avg_card_skill(card_skills)
+				final_skills = readable_skills(card_skills)
+				results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+			
 	return results
 
 def print_results_paginated(data, pageLength=30):
@@ -224,7 +248,7 @@ def print_results_paginated(data, pageLength=30):
 	skill_sorted = sort_scored_results(data)
 
 	# rarity, name, id, adjusted stats, avg skill score
-	out_string = "[{}] {} ({}) - {:.5} / {:.5}"
+	out_string = "[{}] {} ({}) - {:.1f} / {:.1f}"
 
 	print("Sort by Stats + Skill")
 	# pagination to prevent overscroll
