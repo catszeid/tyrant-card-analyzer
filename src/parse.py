@@ -200,14 +200,17 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 			if args.faction is not None and card_type not in args.faction:
 				continue
 		
-			card_level = 1
+			card_level = '1'
 			
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 			avg_skill_score = avg_card_skill(card_skills)
 			final_skills = readable_skills(card_skills)
 
-			results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'level': card_level, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+			results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 
+					   'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 
+					   'health': card_health, 'level': card_level, 'type': card_type, 'adj_stats': adjusted_stats, 
+					   'avg_skill': avg_skill_score, 'skills': final_skills}
 
 			# iterate and apply upgrades
 			for upgrade in card.findall('upgrade'):
@@ -238,7 +241,10 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 				avg_skill_score = avg_card_skill(card_skills)
 				final_skills = readable_skills(card_skills)
-				results[card_id] = {'id': card_id, 'name': card_name, 'rarity': card_rarity, 'adj_stats': adjusted_stats, 'avg_skill': avg_skill_score, 'skills': final_skills}
+				results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 
+					   'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 
+					   'health': card_health, 'level': card_level, 'type': card_type, 'adj_stats': adjusted_stats, 
+					   'avg_skill': avg_skill_score, 'skills': final_skills}
 			
 	return results
 
