@@ -4,6 +4,7 @@ import re
 import argparse
 
 import src.scoring as scor
+from src.sqlize import build_tyrant_db
 
 def heapify_by_score(arr, n, i):
 	largest = i
@@ -84,7 +85,7 @@ def score_by_fields(data, *argv):
 			for arg in argv:
 				score += data[key][arg]
 		except:
-			print(data[key])
+			print(f"Warning: Error while scoring {key}")
 		data[key]['score'] = score
 
 def avg_card_stats(c_health: int, c_attack: int | None, c_cost: int) -> float:
@@ -189,6 +190,7 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				card_health = int(card_health.text)
 			else:
 				print(f"Warning: Card {card_id} in {file} has no health")
+				card_health = None
 				continue
 			# card type (faction)
 			card_type = card.find('type')
@@ -206,14 +208,26 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 			adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 			avg_skill_score = avg_card_skill(card_skills)
 			final_skills = readable_skills(card_skills)
+			card_upgrade_id = None
+			upgrades = card.findall('upgrade')
+			if upgrades is not None:
+				try:
+					card_upgrade_id = upgrades[0].find('card_id').text
+				except:
+					pass
 
 			results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 
 					   'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 
 					   'health': card_health, 'level': card_level, 'type': card_type, 'adj_stats': adjusted_stats, 
-					   'avg_skill': avg_skill_score, 'skills': final_skills}
+					   'avg_skill': avg_skill_score, 'skills': final_skills, 'upgrade_id': card_upgrade_id}
 
 			# iterate and apply upgrades
-			for upgrade in card.findall('upgrade'):
+			for i in range(len(upgrades)):
+				upgrade = upgrades[i]
+				try:
+					card_upgrade_id = upgrades[i+1].find('card_id').text
+				except:
+					card_upgrade_id = None
 				# type (faction) and rarity should not change as part of an upgrade
 				if upgrade.find('card_id') is not None:
 					card_id = upgrade.find('card_id').text
@@ -244,7 +258,7 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 
 					   'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 
 					   'health': card_health, 'level': card_level, 'type': card_type, 'adj_stats': adjusted_stats, 
-					   'avg_skill': avg_skill_score, 'skills': final_skills}
+					   'avg_skill': avg_skill_score, 'skills': final_skills, 'upgrade_id': card_upgrade_id}
 			
 	return results
 
@@ -275,6 +289,8 @@ def main(args):
 	files = get_files(args.file)
 
 	cards = parse_cards(files, args, ignore=True)
+	if 'test.db' not in os.listdir(os.path.join(os.getcwd(), 'data')):
+		build_tyrant_db('data/test.db', 'src/tu_tables.sql', cards)
 	print(f"{len(cards)} cards found!")
 
 	pageLen = args.page if args.page is not None else 30

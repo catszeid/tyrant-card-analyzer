@@ -24,8 +24,9 @@ CREATE TABLE card (
     rarity INTEGER,
     card_set INTEGER,
     type INTEGER,
-    fusion_level INTEGER,
+    fusion_level INTEGER DEFAULT 0,
     upgrade_id INTEGER,
+    level INTEGER DEFAULT 1,
     FOREIGN KEY (rarity) REFERENCES rarity(id),
     FOREIGN KEY (type) REFERENCES type(id),
     FOREIGN KEY (upgrade_id) REFERENCES card(id)
