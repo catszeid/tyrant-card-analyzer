@@ -207,7 +207,7 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 			avg_skill_score = avg_card_skill(card_skills)
-			final_skills = readable_skills(card_skills)
+			final_skills = card_skills
 			card_upgrade_id = None
 			upgrades = card.findall('upgrade')
 			if upgrades is not None:
@@ -254,7 +254,7 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				# add each upgrade to database
 				adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 				avg_skill_score = avg_card_skill(card_skills)
-				final_skills = readable_skills(card_skills)
+				final_skills = card_skills
 				results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 
 					   'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 
 					   'health': card_health, 'level': card_level, 'type': card_type, 'adj_stats': adjusted_stats, 

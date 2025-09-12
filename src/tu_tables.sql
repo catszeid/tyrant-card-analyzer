@@ -42,7 +42,6 @@ CREATE TABLE card_skill (
     a INTEGER,
     trigger INTEGER,
     card_id INTEGER,
-    s TEXT,
     FOREIGN KEY (skill_id) REFERENCES skill(id),
     FOREIGN KEY (trigger) REFERENCES trigger(id),
     FOREIGN KEY (owner_id) REFERENCES card(id),
@@ -63,7 +62,7 @@ INSERT INTO type VALUES(4, "Bloodthirsty");
 INSERT INTO type VALUES(5, "Righteous");
 INSERT INTO type VALUES(6, "Progenitor");
 
-INSERT INTO trigger VALUES(1, "attack");
+INSERT INTO trigger VALUES(1, "attacked");
 INSERT INTO trigger VALUES(2, "death");
 INSERT INTO trigger VALUES(3, "play");
 
