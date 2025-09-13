@@ -75,8 +75,10 @@ def score_skill(skill) -> int:
 			score = int(skill.get('x'))
 		elif id == "Leech": # card 60035 has "pretty" id
 			score = int(skill.get('x'))
+		elif id == "arored": # typed 'armored'
+			score = int(skill.get('x'))
 		else:
-			print("Unknown")
+			print(f"Unknown skill: {id}")
 			score = -10000 # move unknown skill to extreme end
 	return int(score)
 

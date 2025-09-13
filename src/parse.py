@@ -146,7 +146,12 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 			
 			# card rarity filtering
 			card_rarity = card.findtext('rarity', None)
-			if args.rarity is not None and int(card_rarity) not in args.rarity:
+			if card_rarity is not None:
+				try:
+					card_attack = int(card_rarity)
+				except:
+					card_attack = None
+			if args.rarity is not None and card_rarity not in args.rarity:
 				continue
 				
 			# card fusion level
