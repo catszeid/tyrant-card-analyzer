@@ -20,9 +20,10 @@ def build_tyrant_db(db, script: str, data: dict):
         conn.commit()
 
         card_insert = "INSERT INTO card(id, name, attack, health, cost, rarity, card_set, type, fusion_level, upgrade_id) VALUES (?,?,?,?,?,?,?,?,?,?)"
-        skill_insert = "INSERT INTO card_skill(owner_id, skill_id, x, y, n, c, a, trigger, card_id) VALUES (?,?,?,?,?,?,?,?,?)"
+        skill_insert = "INSERT INTO card_skill(owner_id, skill_id, x, y, n, c, a, trigger, card_id, s, s2) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
         get_skill_id = "SELECT id FROM skill WHERE ? = name_xml"
         get_trigger_id = "SELECT id FROM trigger WHERE name = ?"
+
         for key in data:
             owner_id = data[key]['id']
             cursor.execute(card_insert, (owner_id, data[key]['name'], data[key]['attack'], data[key]['health'], data[key]['cost'], data[key]['rarity'], data[key]['set'], data[key]['type'], data[key]['fusion_level'], data[key]['upgrade_id']))
@@ -59,7 +60,17 @@ def build_tyrant_db(db, script: str, data: dict):
                 skill_card_id = skill.get('card_id', None)
                 if skill_card_id is not None:
                     skill_card_id = int(skill_card_id)
-                cursor.execute(skill_insert, (owner_id, skill_id, skill_x, skill_y, skill_n, skill_c, skill_a, skill_trigger, skill_card_id))
+                skill_s = skill.get('s', None)
+                if skill_s is not None:
+                    skill_s = cursor.execute(get_skill_id, [skill_s]).fetchone()
+                    if skill_s is not None:
+                        skill_s = skill_s[0]
+                skill_s2 = skill.get('s2', None)
+                if skill_s2 is not None:
+                    skill_s2 = cursor.execute(get_skill_id, [skill_s2]).fetchone()
+                    if skill_s2 is not None:
+                        skill_s2 = skill_s2[0]
+                cursor.execute(skill_insert, (owner_id, skill_id, skill_x, skill_y, skill_n, skill_c, skill_a, skill_trigger, skill_card_id, skill_s, skill_s2))
 
         conn.commit()
     else:

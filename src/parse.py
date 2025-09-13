@@ -118,9 +118,9 @@ def readable_skills(c_skills: list) -> list:
 def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 	results = {}
 
-	ignored_ids = {}
-	if ignore:
-		ignored_ids = get_ignored_list()
+	# ignored_ids = {}
+	# if ignore:
+		# ignored_ids = get_ignored_list()
 
 	for file in files:
 		tree = ET.parse(os.path.join(os.getcwd(), folder, file))
@@ -134,8 +134,8 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 			if card_id is None:
 				print(f"Warning: Card {card_id} in {file} has no card_id")
 				continue
-			if card_id in ignored_ids:
-				continue
+			#if card_id in ignored_ids:
+				# continue
 			card_name = card.findtext('name', None)
 			if card_name is None:
 				print(f"Warning: Card {card_id} in {file} has no name")

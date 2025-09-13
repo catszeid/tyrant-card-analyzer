@@ -35,15 +35,18 @@ CREATE TABLE card_skill (
     id INTEGER PRIMARY KEY NOT NULL,
     owner_id INTEGER NOT NULL,
     skill_id INTEGER NOT NULL,
-    x INTEGER,
-    y INTEGER,
-    n INTEGER,
-    c INTEGER,
-    a INTEGER,
-    trigger INTEGER,
-    card_id INTEGER,
+    x INTEGER,  -- skill power
+    y INTEGER, -- skill faction (type) restriction
+    n INTEGER, -- units affected
+    c INTEGER, -- cooldown in turns
+    a INTEGER, -- affect all
+    trigger INTEGER, -- alternative trigger
+    card_id INTEGER, -- summoned card id
+    s INTEGER, -- skill to enhance/evolve
+    s2 INTEGER, -- skill evolved to
     FOREIGN KEY (skill_id) REFERENCES skill(id),
     FOREIGN KEY (trigger) REFERENCES trigger(id),
+    FOREIGN KEY (s) REFERENCES skill(id),
     FOREIGN KEY (owner_id) REFERENCES card(id),
     FOREIGN KEY (card_id) REFERENCES card(id)
 );
