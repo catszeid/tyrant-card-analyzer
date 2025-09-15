@@ -88,10 +88,14 @@ def score_by_fields(data, *argv):
 			print(f"Warning: Error while scoring {key}")
 		data[key]['score'] = score
 
-def avg_card_stats(c_health: int, c_attack: int | None, c_cost: int) -> float:
-	sum = c_health
+def avg_card_stats(c_health: int | None, c_attack: int | None, c_cost: int) -> float:
+	sum = 0
+	if c_health is not None:
+		sum += c_health
 	if c_attack is not None:
 		sum += c_attack
+	if c_cost is None:
+		c_cost = 0
 	return sum / (c_cost + 1)
 
 def avg_card_skill(c_skills: list) -> float:
@@ -114,9 +118,9 @@ def readable_skills(c_skills: list) -> list:
 def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 	results = {}
 
-	ignored_ids = {}
-	if ignore:
-		ignored_ids = get_ignored_list()
+	# ignored_ids = {}
+	# if ignore:
+		# ignored_ids = get_ignored_list()
 
 	for file in files:
 		tree = ET.parse(os.path.join(os.getcwd(), folder, file))
@@ -124,90 +128,70 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 		
 		for card in root:
 			if card is None:
-				print("Found empty card in {file}, skipping...")
+				print(f"Found empty card in {file}, skipping...")
 				continue
-			card_id = card.find('id')
-			if card_id is not None:
-				# id ignore, note the id should target base card, not upgrade
-				if card_id.text in ignored_ids:
-					continue
-				card_id = card_id.text
-			else:
+			card_id = card.findtext('id', None)
+			if card_id is None:
 				print(f"Warning: Card {card_id} in {file} has no card_id")
 				continue
-			card_name = card.find('name')
-			if card_name is not None and card_name.text is not None:
-				card_name = card_name.text
-			else:
+			#if card_id in ignored_ids:
+				# continue
+			card_name = card.findtext('name', None)
+			if card_name is None:
 				print(f"Warning: Card {card_id} in {file} has no name")
 				continue
-			card_set = card.find('set')
-			if card_set is not None and card_set.text is not None:
-				card_set = card_set.text
-			else:
-				print(f"Warning: Card {card_id} in {file} does not have a set")
-				continue
+			card_set = card.findtext('set', None)
 			if args.set is not None and int(card_set) not in args.set:
 				continue
 			
 			# card rarity filtering
-			card_rarity = card.find('rarity')
+			card_rarity = card.findtext('rarity', None)
 			if card_rarity is not None:
-				if card_rarity.text is not None:
-					card_rarity = card_rarity.text
-				else:
-					print(f"Warning: Card {card_id} in {file} has no rarity")
-					continue
-				if args.rarity is not None and int(card_rarity) not in args.rarity:
-					continue
+				try:
+					card_attack = int(card_rarity)
+				except:
+					card_attack = None
+			if args.rarity is not None and card_rarity not in args.rarity:
+				continue
 				
 			# card fusion level
-			card_fusion_level = card.find('fusion_level')
-			if card_fusion_level is not None and card_fusion_level.text is not None:
-				card_fusion_level = int(card_fusion_level.text)
-			else:
+			card_fusion_level = card.findtext('fusion_level', None)
+			if card_fusion_level is None:
 				card_fusion_level = 0
-			if args.fusion_level is not None and int(card_fusion_level) not in args.fusion_level:
+			else:
+				card_fusion_level = int(card_fusion_level)
+			if args.fusion_level is not None and card_fusion_level not in args.fusion_level:
 				continue
 			# card cost (Commander have no cost)
-			card_cost = card.find('cost')
-			if card_cost is None:
-				continue # commander analysis will be considered later
-			if card_cost.text is not None:
-				if args.cost is not None and int(card_cost.text) not in args.cost:
-					continue
-				card_cost = int(card_cost.text)
-			else:
-				print(f"Warning: Card {card_id} in {file} has no cost")
+			card_cost = card.findtext('cost', None)
+			if card_cost is not None:
+				try:
+					card_cost = int(card_cost)
+				except:
+					card_cost = None
+			if args.cost is not None and card_fusion_level not in args.fusion_level:
 				continue
 			# card attack (Structure have no attack)
-			card_attack = card.find('attack')
-			if card_attack is not None and card_attack.text is not None:
-				card_attack = int(card_attack.text)
+			card_attack = card.findtext('attack', None)
+			if card_attack is not None:
+				card_attack = int(card_attack)
 			# card health
-			card_health = card.find('health')
-			if card_health is not None and card_health.text is not None:
-				card_health = int(card_health.text)
-			else:
-				print(f"Warning: Card {card_id} in {file} has no health")
-				card_health = None
-				continue
+			card_health = card.findtext('health', None)
+			if card_health is not None:
+				card_health = int(card_health)
 			# card type (faction)
-			card_type = card.find('type')
-			if card_type is not None and card_type.text is not None:
-				card_type = int(card_type.text)
-			else:
-				print(f"Warning: Card {card_id} in {file} has no type")
-				continue
+			card_type = card.findtext('type', None)
+			if card_type is not None:
+				card_type = int(card_type)
 			if args.faction is not None and card_type not in args.faction:
 				continue
 		
-			card_level = '1'
+			card_level = 1
 			
 			card_skills = card.findall('skill') # list of 'skill' Elements
 			adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 			avg_skill_score = avg_card_skill(card_skills)
-			final_skills = readable_skills(card_skills)
+			final_skills = card_skills
 			card_upgrade_id = None
 			upgrades = card.findall('upgrade')
 			if upgrades is not None:
@@ -224,27 +208,33 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 			# iterate and apply upgrades
 			for i in range(len(upgrades)):
 				upgrade = upgrades[i]
-				try:
-					card_upgrade_id = upgrades[i+1].find('card_id').text
-				except:
+				if i+1 < len(upgrades):
+					card_upgrade_id = upgrades[i+1].findtext('card_id')
+				else:
 					card_upgrade_id = None
 				# type (faction) and rarity should not change as part of an upgrade
-				if upgrade.find('card_id') is not None:
-					card_id = upgrade.find('card_id').text
-				if upgrade.find('level') is not None:
-					card_level = upgrade.find('level').text
-				if upgrade.find('attack') is not None:
-					if upgrade.find('attack').text is None: # 47055 has 'attack' with no text
-						print(f"Warning: Empty attack tag in card {card_id} in {file}")
-					else:
-						card_attack = int(upgrade.find('attack').text)
-				if upgrade.find('health') is not None:
-					card_health = int(upgrade.find('health').text)
-				if upgrade.find('cost') is not None:
-					if upgrade.find('cost').text is None:
-						print(f"Warning: Card {card_id} in {file} has empty cost field")
-					else:
-						card_cost = int(upgrade.find('cost').text)
+				card_id = upgrade.findtext('card_id', None)
+				card_level = upgrade.findtext('level', None)
+				if card_level is not None:
+					card_level = int(card_level)
+				card_attack = upgrade.findtext('attack', None)
+				if card_attack is not None:
+					try:
+						card_attack = int(card_attack)
+					except:
+						card_attack = None
+				card_health = upgrade.findtext('health', None)
+				if card_health is not None:
+					try:
+						card_health = int(card_health)
+					except:
+						card_health = None
+				card_cost = upgrade.findtext('cost', None)
+				if card_cost is not None:
+					try:
+						card_cost = int(card_cost)
+					except:
+						card_cost = None
 				if len(upgrade.findall('skill')) != 0:
 					# reset skills and refill the list
 					card_skills = []
@@ -254,12 +244,11 @@ def parse_cards(files: list, args, folder='data', ignore=True) -> dict:
 				# add each upgrade to database
 				adjusted_stats = avg_card_stats(card_health, card_attack, card_cost)
 				avg_skill_score = avg_card_skill(card_skills)
-				final_skills = readable_skills(card_skills)
+				final_skills = card_skills
 				results[card_id] = {'id': card_id, 'name': card_name, 'set': card_set, 'rarity': card_rarity, 
 					   'fusion_level': card_fusion_level, 'cost': card_cost, 'attack': card_attack, 
 					   'health': card_health, 'level': card_level, 'type': card_type, 'adj_stats': adjusted_stats, 
 					   'avg_skill': avg_skill_score, 'skills': final_skills, 'upgrade_id': card_upgrade_id}
-			
 	return results
 
 def print_results_paginated(data, pageLength=30):

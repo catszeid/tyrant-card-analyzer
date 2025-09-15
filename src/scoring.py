@@ -72,11 +72,19 @@ def score_skill(skill) -> int:
 		score += s_x * 1 # check rate
 	else: # default 1:1 budgeting
 		if id in SKILLS:
-			score = int(skill.get('x'))
+			try:
+				score = int(skill.get('x'))
+			except: # 19509, 19510 have <skill id="besiege" s="11"/>, <skill id="besiege" s="21"/>
+				try:
+					score = int(skill.get('s'))
+				except:
+					score = 0
 		elif id == "Leech": # card 60035 has "pretty" id
 			score = int(skill.get('x'))
+		elif id == "arored": # typoed 'armored'
+			score = int(skill.get('x'))
 		else:
-			print("Unknown")
+			print(f"Unknown skill: {id}")
 			score = -10000 # move unknown skill to extreme end
 	return int(score)
 

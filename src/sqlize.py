@@ -1,5 +1,6 @@
 from sqlite3 import Connection, connect
 import os
+import xml.etree.ElementTree as ET
 
 def connect_db(file: str) -> Connection:
     con = connect(file)
@@ -19,8 +20,57 @@ def build_tyrant_db(db, script: str, data: dict):
         conn.commit()
 
         card_insert = "INSERT INTO card(id, name, attack, health, cost, rarity, card_set, type, fusion_level, upgrade_id) VALUES (?,?,?,?,?,?,?,?,?,?)"
+        skill_insert = "INSERT INTO card_skill(owner_id, skill_id, x, y, n, c, a, trigger, card_id, s, s2) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+        get_skill_id = "SELECT id FROM skill WHERE ? = name_xml"
+        get_trigger_id = "SELECT id FROM trigger WHERE name = ?"
+
         for key in data:
-            cursor.execute(card_insert, (data[key]['id'], data[key]['name'], data[key]['attack'], data[key]['health'], data[key]['cost'], data[key]['rarity'], data[key]['set'], data[key]['type'], data[key]['fusion_level'], data[key]['upgrade_id']))
+            owner_id = data[key]['id']
+            cursor.execute(card_insert, (owner_id, data[key]['name'], data[key]['attack'], data[key]['health'], data[key]['cost'], data[key]['rarity'], data[key]['set'], data[key]['type'], data[key]['fusion_level'], data[key]['upgrade_id']))
+            for skill in data[key]["skills"]:
+                owner_id = int(owner_id)
+                skill_name = skill.get('id', None)
+                if skill_name == 'arored':
+                    skill_name = 'armored'
+                elif skill_name == 'Leech':
+                    skill_name = 'leech'
+                try:
+                    skill_id = cursor.execute(get_skill_id, [skill_name]).fetchone()[0]
+                except:
+                    print(f"Failed to find skill in db: {skill_name}.")
+                    continue
+                skill_x = skill.get('x', None)
+                if skill_x is not None:
+                    skill_x = int(skill_x)
+                skill_y = skill.get('y', None)
+                if skill_y is not None:
+                    skill_y = int(skill_y)
+                skill_n = skill.get('n', None)
+                if skill_n is not None:
+                    skill_n = int(skill_n)
+                skill_c = skill.get('c', None)
+                if skill_c is not None:
+                    skill_c = int(skill_c)
+                skill_a = skill.get('a', None)
+                if skill_a is not None:
+                    skill_a = int(skill_a)
+                skill_trigger = skill.get('trigger', None)
+                if skill_trigger is not None:
+                    skill_trigger = cursor.execute(get_trigger_id, [skill_trigger]).fetchone()[0]
+                skill_card_id = skill.get('card_id', None)
+                if skill_card_id is not None:
+                    skill_card_id = int(skill_card_id)
+                skill_s = skill.get('s', None)
+                if skill_s is not None:
+                    skill_s = cursor.execute(get_skill_id, [skill_s]).fetchone()
+                    if skill_s is not None:
+                        skill_s = skill_s[0]
+                skill_s2 = skill.get('s2', None)
+                if skill_s2 is not None:
+                    skill_s2 = cursor.execute(get_skill_id, [skill_s2]).fetchone()
+                    if skill_s2 is not None:
+                        skill_s2 = skill_s2[0]
+                cursor.execute(skill_insert, (owner_id, skill_id, skill_x, skill_y, skill_n, skill_c, skill_a, skill_trigger, skill_card_id, skill_s, skill_s2))
 
         conn.commit()
     else:
