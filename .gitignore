@@ -3,3 +3,5 @@ venv
 *.env
 *.db
 data/*.xml
+server/card_browser/migrations/*.py
+server/*.sqlite3
