@@ -85,7 +85,7 @@ class Card_Skill(models.Model):
         if skill_name == 'Evolve':
             targets = self.n
             if self.all is not None and self.all == 1:
-                targets = 'all'
+                targets = 'All'
             if targets is None:
                 targets = 1
             return f"{skill_name} {targets} {self.s} to {self.s2}"
@@ -101,7 +101,7 @@ class Card_Skill(models.Model):
             all = ""
             y = ""
             if self.all is not None and self.all == 1:
-                all = " all"
+                all = " All"
             if self.y is not None:
                 y = f" {self.y}"
             return f"{skill_name}{all}{y} {self.x}"

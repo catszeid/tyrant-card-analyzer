@@ -26,5 +26,12 @@ def download_cards(request):
 
 def card_detail(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
-    skills = get_list_or_404(Card_Skill, owner_id=card_id)
-    return render(request, "card_browser/card.html", {"card_data": card, "card_skills": skills})
+    prev_card = Card.objects.filter(upgrade_id=card_id).values()
+    if len(prev_card) > 0:
+        prev_card = prev_card[0]
+    next_card = Card.objects.filter(id=card.upgrade_id).values()
+    if len(next_card) > 0:
+        next_card = next_card[0]
+    skills = Card_Skill.objects.filter(owner_id=card_id)
+
+    return render(request, "card_browser/card.html", {"card_data": card, "card_skills": skills, "next_card": next_card, "prev_card": prev_card})
