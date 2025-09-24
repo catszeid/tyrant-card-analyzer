@@ -9,4 +9,10 @@
         <p><b>Attack:</b> {{ card_data.attack }}</p>
         <p><b>Health:</b> {{ card_data.health }}</p>
         <!-- SKILLS-->
+        <p><b>Skills:</b></p>
+        <ul>
+        {% for skill in card_skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+        </ul>
     </ul>

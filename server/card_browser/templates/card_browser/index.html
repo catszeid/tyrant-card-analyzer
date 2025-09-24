@@ -1,5 +1,5 @@
 <ul>
 {% for card in card_data %}
-    <li><a href="{% url 'detail' card.id %}">{{ card.name }}</a></li>
-{% end for %}
+    <li><a href="{% url 'card_browser:detail' card.id %}">{{ card.name }}</a></li>
+{% endfor %}
 </ul>
