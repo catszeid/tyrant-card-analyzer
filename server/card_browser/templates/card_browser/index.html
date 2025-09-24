@@ -1,0 +1,5 @@
+<ul>
+{% for card in card_data %}
+    <li><a href="{% url 'detail' card.id %}">{{ card.name }}</a></li>
+{% end for %}
+</ul>

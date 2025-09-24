@@ -1,0 +1,12 @@
+    <ul>
+        <h1><a href="{% url 'card_browser:detail' card_data.id %}">{{ card_data.name }}</a></h1>
+        <p><b>Faction:</b> {{ card_data.faction }}</p>
+        <p><b>Level:</b> {{ card_data.level }}</p>
+        <p><b>Fusion Level:</b> {{ card_data.fusion_level }}</p>
+        <p><b>Card Set:</b> {{ card_data.card_set }}</p>
+        <p><b>Rarity:</b> {{ card_data.rarity }}</p>
+        <p><b>Delay:</b> {{ card_data.cost }}</p>
+        <p><b>Attack:</b> {{ card_data.attack }}</p>
+        <p><b>Health:</b> {{ card_data.health }}</p>
+        <!-- SKILLS-->
+    </ul>
