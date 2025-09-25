@@ -1,0 +1,22 @@
+.light-body {
+    background-color: slategray;
+}
+
+.nav {
+    background: lightgray;
+    border: 5px gray;
+    border-style: groove;
+    text-decoration: none;
+}
+
+.content {
+    background: lightgray;
+    padding: 4px;
+    border: 5px ghostwhite solid;
+}
+
+.footer {
+    border: 10px gray;
+    background-color: aqua;
+    padding: 4px;
+}

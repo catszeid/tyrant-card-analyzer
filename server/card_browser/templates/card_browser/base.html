@@ -1,14 +1,15 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
         {% block head %}
         <title>{% block title %}{% endblock %} - TU DB</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="{% static 'card_browser/style.css' %}">
         {% endblock %}
     </head>
-    <body>
-        <div id="content">{% block content %}{% endblock %}</div>
-        <div id="footer">
+    <body class="light-body">
+        <div class="content" id="content">{% block content %}{% endblock %}</div>
+        <div class="footer" id="footer">
             {% block footer %}
             <p>I do not claim ownership of Tyrant Unleased or the related data displayed on this site.</p>
             {% endblock %}
