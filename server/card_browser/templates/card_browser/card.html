@@ -1,31 +1,30 @@
-<html>
-    <head>
-        <title>TU - {{ card_data.name }}</title>
-    </head>
-    <body>
-        {% if prev_card %}
-        <h2><a href="{% url 'card_browser:detail' prev_card.id %}">Previous: {{ prev_card.name }}-{{ prev_card.level }}</a></h2>
-        {% endif %}
-        {% if next_card %}
-        <h2><a href="{% url 'card_browser:detail' next_card.id %}">Next: {{ next_card.name }}-{{ next_card.level }}</a></h2>
-        {% endif %}
-        <h1><a href="{% url 'card_browser:detail' card_data.id %}">{{ card_data.name }}</a></h1>
-        <p><b>Faction:</b> {{ card_data.faction }}</p>
-        <p><b>Level:</b> {{ card_data.level }}</p>
-        <p><b>Fusion Level:</b> {{ card_data.fusion_level }}</p>
-        <p><b>Card Set:</b> {{ card_data.card_set.id }}</p>
-        <p><b>Rarity:</b> {{ card_data.rarity }}</p>
-        <p><b>Delay:</b> {{ card_data.cost }}</p>
-        <p><b>Attack:</b> {{ card_data.attack }}</p>
-        <p><b>Health:</b> {{ card_data.health }}</p>
-        <!-- SKILLS-->
-        {% if card_skills %}
+{% extends "card_browser/base.html" %}
+{% block title %}{{ card_data.name }}{% endblock %}
+{% block content %}
+<div class="card_nav">
+    {% if prev_card %}
+        <h2 style="text-align: left;"><a href="{% url 'card_browser:detail' prev_card.id %}">Previous: {{ prev_card.name }}-{{ prev_card.level }}</a></h2>
+    {% endif %}
+    {% if next_card %}
+        <h2 style="text-align: right;"><a href="{% url 'card_browser:detail' next_card.id %}">Next: {{ next_card.name }}-{{ next_card.level }}</a></h2>
+    {% endif %}
+</div>
+    <h1><a href="{% url 'card_browser:detail' card_data.id %}">{{ card_data.name }}</a></h1>
+    <p><b>Faction:</b> {{ card_data.faction }}</p>
+    <p><b>Level:</b> {{ card_data.level }}</p>
+    <p><b>Fusion Level:</b> {{ card_data.fusion_level }}</p>
+    <p><b>Card Set:</b> {{ card_data.card_set.id }}</p>
+    <p><b>Rarity:</b> {{ card_data.rarity }}</p>
+    <p><b>Delay:</b> {{ card_data.cost }}</p>
+    <p><b>Attack:</b> {{ card_data.attack }}</p>
+    <p><b>Health:</b> {{ card_data.health }}</p>
+    <!-- SKILLS-->
+    {% if card_skills %}
         <p><b>Skills:</b></p>
         <ul>
         {% for skill in card_skills %}
             <li>{{ skill }}</li>
         {% endfor %}
         </ul>
-        {% endif %}
-    </body>
-</html>
+    {% endif %}
+{% endblock %}

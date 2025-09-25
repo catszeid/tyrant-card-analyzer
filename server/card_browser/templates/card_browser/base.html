@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block head %}
+        <title>{% block title %}{% endblock %} - TU DB</title>
+        <link rel="stylesheet" href="style.css">
+        {% endblock %}
+    </head>
+    <body>
+        <div id="content">{% block content %}{% endblock %}</div>
+        <div id="footer">
+            {% block footer %}
+            <p>I do not claim ownership of Tyrant Unleased or the related data displayed on this site.</p>
+            {% endblock %}
+        </div>
+    </body>
+</html>
