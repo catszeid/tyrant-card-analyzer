@@ -8,10 +8,17 @@
         {% endblock %}
     </head>
     <body class="light-body">
+        <div class="page-header" id="page-header">
+            {% block page-header %}
+            <h1><a href="{% url 'card_browser:index' %}">TU DB</a></h1>
+            {% endblock %}
+        </div>
+        <div class="nav">{% block nav %}{% endblock %}</div>
         <div class="content" id="content">{% block content %}{% endblock %}</div>
         <div class="footer" id="footer">
             {% block footer %}
-            <p>I do not claim ownership of Tyrant Unleased or the related data displayed on this site.</p>
+            <p>I do not claim ownership of Tyrant Unleased or the related 
+                data displayed on this site.</p>
             {% endblock %}
         </div>
     </body>

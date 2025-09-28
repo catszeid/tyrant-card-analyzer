@@ -1,22 +1,38 @@
+:root {
+    --primary-color: lightslategray;
+    --secondary-color: gainsboro;
+    --accent-color: whitesmoke;
+    --text-color: black;
+    --button-color: rgb(167, 16, 16);
+    --button-hover-color: rgb(189, 16, 16);
+}
 .light-body {
-    background-color: slategray;
+    background-color: var(--primary-color);
+    max-width: 1200px;
+    min-width: 480px;
+    margin: 0px auto;
+}
+
+.page-header {
+    background-color: var(--secondary-color);
+    padding: 6px;
 }
 
 .nav {
-    background: lightgray;
-    border: 5px gray;
+    background: var(--accent-color);
+    border: 5px var(--accent-color);
     border-style: groove;
     text-decoration: none;
 }
 
 .content {
-    background: lightgray;
+    background: var(--secondary-color);
     padding: 4px;
-    border: 5px ghostwhite solid;
+    border: 4px var(--secondary-color) solid;
 }
 
 .footer {
-    border: 10px gray;
-    background-color: aqua;
+    border: 10px var(--accent-color) groove;
+    background-color: var(--secondary-color);
     padding: 4px;
 }
