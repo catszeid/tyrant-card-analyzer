@@ -3,7 +3,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render
 
 from .models import Card, Card_Skill
 
-from card_browser.tasks import download_files_task, rebuild_card_db_task, test_task
+from card_browser.tasks import download_files_task, rebuild_card_db_task
 
 def index(request):
     cards = get_list_or_404(Card)[:10]
@@ -16,16 +16,13 @@ def initialize_database(request):
     return HttpResponse("Initialized database successfully!")
 
 def download_cards(request):
-    # back up data?
     # download
     files = ['skills_set.xml',
              'fusion_recipes_cj2.xml']
     for i in range(1, 22):
         files.append(f"cards_section_{i}.xml")
     download_files_task.delay(files)
-    #download_files_task.delay(files)
     return HttpResponse("Downloading card data now...")
-
 
 def card_detail(request, card_id):
     card = get_object_or_404(Card, pk=card_id)

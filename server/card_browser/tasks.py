@@ -141,6 +141,7 @@ def rebuild_card_db_task():
 
     # card + card_skill
     card_files = []
+    # TODO: Dynamic range via data contents, not fixed
     for i in range(1, 22):
         card_files.append(f"cards_section_{i}.xml")
     data = parse_cards(card_files)

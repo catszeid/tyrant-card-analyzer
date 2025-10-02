@@ -25,7 +25,7 @@ def parse_factions() -> dict:
 
 # parse skill data from 'skills_set.xml'
 def parse_skills() -> dict:
-	tree = ET.parse(os.path.join(settings.STATICFILES_DIR[0], '../data/skills_set.xml'))
+	tree = ET.parse(os.path.join(settings.STATICFILES_DIR[0], 'skills_set.xml'))
 	root = tree.getroot()
 
 	skills = root.findall('skillType')
@@ -67,7 +67,7 @@ def parse_card_sets() -> dict:
 	for set in card_sets:
 		s = dict()
 		s['id'] = set.findtext('id')
-		s['name'] = set.findtext('id')
+		s['name'] = set.findtext('name')
 		result[s['id']] = s
 	return result
 
