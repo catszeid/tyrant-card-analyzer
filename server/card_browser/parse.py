@@ -4,28 +4,11 @@ import re
 from django.conf import settings
 
 # Find files matching the regex pattern
-def find_files(file_pattern, folder='../data') -> list:
-	dir_contents = os.listdir(os.path.join(os.getcwd(), folder))
+def find_files(file_pattern) -> list:
+	dir_contents = os.listdir(settings.STATICFILES_DIR[0])
 	pattern = re.compile(file_pattern)
 	match_files = [file for file in dir_contents if pattern.fullmatch(file)]
 	return match_files
-
-# get the list of data files to read for cards
-# When files is None, it will search for all files matching the default naming scheme
-def get_files(files=None, folder='../data') -> list:
-	fileList = []
-	if files is not None:
-		dir_contents = os.listdir(os.path.join(os.getcwd(), folder))
-		for file in files:
-			if file in dir_contents:
-				fileList.append(file)
-			else:
-				print(f"Failed to find {file}")
-	else:
-		pattern = "^cards_section_\\d+.xml$"
-		fileList = find_files(pattern, folder)
-
-	return fileList
 
 # parse faction data from 'skills_set.xml'
 def parse_factions() -> dict:

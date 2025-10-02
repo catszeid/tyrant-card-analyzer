@@ -2,6 +2,7 @@ __pycache__
 venv
 *.env
 *.db
+*.bak
 data/*.xml
 server/card_browser/migrations/*.py
 server/*.sqlite3

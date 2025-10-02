@@ -1,6 +1,5 @@
 import requests
 import os
-import gzip
 
 from django.conf import settings
 
