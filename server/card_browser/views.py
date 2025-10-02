@@ -1,9 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 
-from.download_files import download_all_card_data_files
 from .models import Card, Card_Skill
-from .sqlize import delete_old_data, build_tyrant_db
 
 from card_browser.tasks import download_files_task, rebuild_card_db_task, test_task
 
